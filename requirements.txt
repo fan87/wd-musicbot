@@ -1,0 +1,4 @@
+discord~=1.7.3
+pafy~=0.5.5
+typing~=3.7.4.3
+pykson~=0.9.9.8.7
