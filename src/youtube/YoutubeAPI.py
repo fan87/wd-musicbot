@@ -88,7 +88,6 @@ async def search(query: str) -> Search:
 
 
 async def get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
-    print("Get Track Start")
     body: dict = {
         "context": {
             "client": {

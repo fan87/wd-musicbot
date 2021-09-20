@@ -94,7 +94,6 @@ class GuildPlayer:
 
     def __after(self, error: Error) -> None:
         if not self.skipped:
-            print("After")
             if self.get_current_track() is None:
                 return
 

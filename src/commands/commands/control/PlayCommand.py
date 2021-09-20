@@ -50,10 +50,8 @@ async def on_command(message: Message, *, song: str) -> None:
             await utils.MessageUtil.reply_fancy_message(":grimacing: 抱歉我沒找到音樂，請再次使用指令搜尋", discord.Colour.red(), message)
             return
         yt = result.videos[0]
-    print("Search Start")
     track: Track = await guild_player.get_track_from_youtube_pytube(yt)
     if guild_player.add_to_queue(track):
-        print("Search Done")
         embed: discord.Embed = discord.Embed()
         embed.title = yt.title
         embed.set_author(name=yt.author)
@@ -62,7 +60,6 @@ async def on_command(message: Message, *, song: str) -> None:
         embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hqdefault.jpg")
         await message.reply(embed=embed, mention_author=False)
     else:
-        print("Search Done")
         embed = discord.Embed()
         embed.title = yt.title
         embed.set_author(name=yt.author)
