@@ -126,6 +126,8 @@ class GuildPlayer:
             self.__play_track(cast(Track, next))
             return True
         else:
+            if len(self.tracks) == 1:
+                self.tracks.pop(0)
             return False
 
 

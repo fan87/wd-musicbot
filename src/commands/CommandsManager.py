@@ -98,7 +98,7 @@ class CommandsManager:
                         parameters.append(None)
                     continue
                 try:
-                    type: str = str(para).replace(" ", "").split(":")[1]
+                    type: str = str(para).replace(" ", "").split(":")[1].split("=")[0]
                     parameters.append(self.convert(message, arguments[count], type))
                 except:
                     parameters.append(arguments[count])
@@ -121,10 +121,10 @@ class CommandsManager:
                 if not 1 == -1:
                     argument = argument[:-1]
                 try:
-                    type = str(para).replace(" ", "").split(":")[1]
+                    type = str(para).replace(" ", "").split(":")[1].split("=")[0]
                     starstarpara = self.convert(message, argument, type)
                 except:
-                    starstarpara = argument
+                    starstarpara = argument.split("=")[0]
                 break
 
         if starstar != "":
@@ -137,7 +137,6 @@ class CommandsManager:
 
     def convert(self, message: Message, stringIn: str, typeIn: str) -> Any:
         import InstanceManager
-
         if typeIn == "str":
             return stringIn
         if typeIn == "int":
