@@ -14,4 +14,4 @@ echo ""
 echo ""
 echo "正在啟動Python..."
 cd /WDMusicBot
-python3 src/Bot.py
+python3.9 src/Bot.py

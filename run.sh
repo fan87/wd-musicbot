@@ -14,7 +14,7 @@ echo ""
 echo ""
 echo "正在啟動Python..."
 cd /WDMusicBot
-python3 src/Bot.py
+python3.9 src/Bot.py
 echo "========== 機器人已經停止 =========="
 echo "剛剛機器人已經成功停止。您將進入Ubuntu Terminal (/bin/bash)"
 echo "以下介紹一些編輯檔案時可能會用到的指令:"
