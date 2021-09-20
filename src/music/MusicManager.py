@@ -128,6 +128,7 @@ class GuildPlayer:
         else:
             if len(self.tracks) == 1:
                 self.tracks.pop(0)
+                return True
             return False
 
 
