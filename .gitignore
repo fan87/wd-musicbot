@@ -3,3 +3,4 @@ run/
 environment.json
 venv/
 .idea/
+.vscode/

@@ -1,2 +1,3 @@
+from typing import Union
 from Bot import WDMusicBot
-mainInstance: WDMusicBot = None 
+mainInstance: Union[WDMusicBot, None] = None 

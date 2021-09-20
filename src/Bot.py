@@ -1,23 +1,12 @@
-from logging import Logger
-
 from discord.flags import Intents
 from music.MusicManager import MusicManager
 from commands.CommandsManager import CommandsManager
 from dataSaver.ConfigsManager import ConfigsManager
 from events.EventManager import DiscordEventManager, DiscordEventType
 
-from typing import IO
-import os
-
 import discord
-from pykson import Pykson
 
 from dataSaver.BotConfig import BotConfig
-
-
-
-
-Logger.level = "debug"
 
 
 
@@ -30,7 +19,7 @@ class WDMusicBot(discord.Client):
 
     config: BotConfig = BotConfig()
 
-    def __init__(self):
+    def __init__(self) -> None:
         
         super().__init__(intents=Intents.all())
         
@@ -49,13 +38,13 @@ class WDMusicBot(discord.Client):
         self.register_listeners()
         
 
-    def register_listeners(self):
+    def register_listeners(self) -> None:
         self.eventManager.add_listener(DiscordEventType.ON_READY, self.ready_handling)
 
-    def start_bot(self):
+    def start_bot(self) -> None:
         self.run(self.config.token)
 
-    async def ready_handling(self):
+    async def ready_handling(self) -> None:
         print("機器人已經成功連線至Discord! ")
 
 
@@ -66,3 +55,5 @@ if __name__ == "__main__":
     print("成功啟動Python! 正在啟動機器人")
     bot = WDMusicBot()
     bot.start_bot()
+
+

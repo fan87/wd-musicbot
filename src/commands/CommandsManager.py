@@ -1,4 +1,7 @@
 
+import functools
+from typing import TYPE_CHECKING, Any, Callable
+import typing
 from discord.channel import TextChannel
 from discord.member import Member
 from discord.message import Message
@@ -9,6 +12,9 @@ from logging import Logger
 import os
 import inspect
 
+if TYPE_CHECKING:
+    from Bot import WDMusicBot
+    from commands.Command import WDCommand
 
 
 class CommandsManager:
@@ -17,7 +23,7 @@ class CommandsManager:
     commands: dict = {}
     prefix: str = ""
 
-    def __init__(self, bot, prefix: str) -> None:
+    def __init__(self, bot: 'WDMusicBot', prefix: str) -> None:
         self.bot = bot
         self.prefix = prefix
 
@@ -41,7 +47,7 @@ class CommandsManager:
         bot: WDMusicBot = self.bot
         bot.eventManager.add_listener(DiscordEventType.ON_MESSAGE, self.process_command)
 
-    async def process_command(self, message: Message):
+    async def process_command(self, message: Message) -> None:
         from commands.Command import WDCommand
         user: User = message.author
         if user.bot:
@@ -60,18 +66,18 @@ class CommandsManager:
         
         await self.invoke(command, message)
 
-    async def invoke(self, command, message: Message):
+    async def invoke(self, command: 'WDCommand', message: Message) -> None:
         old_arguments: list[str] = message.content.split(" ")[1:]
         arguments: list[str] = []
         for arg in old_arguments:
             if arg != "":
                 arguments.append(arg)
         
-        parameters: list[any] = [message]
+        parameters: list = [message]
         func = self.commands[command]["main"]
         count: int = -2
         starstar: str = ""
-        starstarpara: any = None
+        starstarpara: Any = None
         for parameter in inspect.signature(func).parameters.items():
             count = count + 1
             if count == -1:
@@ -97,18 +103,18 @@ class CommandsManager:
                     starstarpara = None
                     continue
                 i: int = -1
-                arg: str = ""
+                argument: str = ""
                 for a in arguments:
                     i += 1
                     if i >= count:
-                        arg += a + " "
+                        argument += a + " "
                 if not 1 == -1:
-                    arg = arg[:-1]
+                    argument = argument[:-1]
                 try:
-                    type: str = str(para).replace(" ", "").split(":")[1]
-                    starstarpara = self.convert(message, arg, type)
+                    type = str(para).replace(" ", "").split(":")[1]
+                    starstarpara = self.convert(message, argument, type)
                 except:
-                    starstarpara = arg
+                    starstarpara = argument
                 break;
         if starstar != "":
             await func(*parameters, **{starstar: starstarpara})
@@ -116,7 +122,7 @@ class CommandsManager:
             await func(*parameters)
 
 
-    def convert(self, message: Message, stringIn: str, typeIn: str) -> any:
+    def convert(self, message: Message, stringIn: str, typeIn: str) -> Any:
         import InstanceManager
 
         if typeIn == "str":
@@ -133,13 +139,13 @@ class CommandsManager:
                 member: Member = InstanceManager.mainInstance.get_user(int(id))
                 return member
             if stringIn.startswith("<@") and stringIn.endswith(">"):
-                id: str = stringIn[2:-1]
-                member: Member = InstanceManager.mainInstance.get_user(int(id))
+                id = stringIn[2:-1]
+                member = InstanceManager.mainInstance.get_user(int(id))
                 return member
         return None
 
 
-    def find_command(self, command_name: str) -> any:
+    def find_command(self, command_name: str) -> typing.Union['WDCommand', None]:
         from commands.Command import WDCommand
         for command in self.commands.keys():
             cmd: WDCommand = command
@@ -151,21 +157,21 @@ class CommandsManager:
         return None
 
 
-def main_command(description: str, head_command, **kwargs):
+def main_command(description: str, head_command: Any, **kwargs: Any) -> Callable[[Any], Any]:
     from commands.Command import WDCommand
     import InstanceManager
 
     if issubclass(WDCommand, head_command):
         raise TypeError("Head Command must extends WDCommand")
     
-    def inner(func):
+    def inner(func: Any) -> Any:
         import InstanceManager
         if not inspect.isfunction(func):
             raise TypeError("Registered non-function command executable")
         found: bool = False
         for instance in InstanceManager.mainInstance.commandsManager.commands.keys():
             if type(instance) == head_command:
-                InstanceManager.mainInstance.commandsManager.commands[instance].update({"main": func})
+                InstanceManager.mainInstance.commandsManager.commands[instance].update({"main": func, "main_description": description, "argument_info": kwargs})
                 found = True
         if not found:
             raise LookupError("The Head Command is not registered. Please decorate with @register_command and define the class before the function. Also make sure the class is declared in the same file where you declared the function")
@@ -174,7 +180,7 @@ def main_command(description: str, head_command, **kwargs):
     return inner
 
 
-def register_command(clazz):
+def register_command(clazz: Any) -> Any:
     from commands.Command import WDCommand
     import InstanceManager
 

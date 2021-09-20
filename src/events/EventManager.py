@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Callable
+from typing import Callable, Any
 
 import discord
 
@@ -74,257 +74,257 @@ class DiscordEventManager:
 
     __listeners: list = []
 
-    def __init__(self, bot: discord.Client):
+    def __init__(self, bot: discord.Client) -> None:
         self.__bot = bot
         self.register_listeners()
 
-    def add_listener(self, event_type: DiscordEventType, func: Callable):
+    def add_listener(self, event_type: DiscordEventType, func: Callable) -> None:
         self.__listeners.append({"event_type": event_type, "func": func})
 
-    async def fire_event(self, event_type: DiscordEventType, *args):
+    async def fire_event(self, event_type: DiscordEventType, *args) -> None:
         for listener in self.__listeners:
             if listener["event_type"] == event_type:
                 func: Function = listener["func"]
                 await func(*args)
 
 
-    def register_listeners(self):
+    def register_listeners(self) -> None:
         @self.__bot.event
-        async def on_connect():
+        async def on_connect() -> None:
             await self.fire_event(DiscordEventType.ON_CONNECT)
 
         @self.__bot.event
-        async def on_shard_connect():
+        async def on_shard_connect() -> None:
             await self.fire_event(DiscordEventType.ON_SHARD_CONNECT)
 
         @self.__bot.event
-        async def on_disconnect():
+        async def on_disconnect() -> None:
             await self.fire_event(DiscordEventType.ON_DISCONNECT)
 
         @self.__bot.event
-        async def on_shard_disconnect():
+        async def on_shard_disconnect() -> None:
             await self.fire_event(DiscordEventType.ON_SHARD_DISCONNECT)
 
         @self.__bot.event
-        async def on_ready():
+        async def on_ready() -> None:
             await self.fire_event(DiscordEventType.ON_READY)
 
         @self.__bot.event
-        async def on_shard_ready():
+        async def on_shard_ready() -> None:
             await self.fire_event(DiscordEventType.ON_SHARD_READY)
 
         @self.__bot.event
-        async def on_resumed():
+        async def on_resumed() -> None:
             await self.fire_event(DiscordEventType.ON_RESUMED)
 
         @self.__bot.event
-        async def on_shard_resumed():
+        async def on_shard_resumed() -> None:
             await self.fire_event(DiscordEventType.ON_SHARD_RESUMED)
 
 
 
         @self.__bot.event
-        async def on_socket_raw_received(arg0):
+        async def on_socket_raw_received(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_SOCKET_RAW_RECEIVED, arg0)
 
         @self.__bot.event
-        async def on_socket_raw_send(arg0):
+        async def on_socket_raw_send(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_SOCKET_RAW_SEND, arg0)
 
         @self.__bot.event
-        async def on_typing(arg0, arg1, arg2):
+        async def on_typing(arg0: Any, arg1: Any, arg2: Any) -> None:
             await self.fire_event(DiscordEventType.ON_TYPING, arg0, arg1, arg2)
 
         @self.__bot.event
-        async def on_message(arg0):
+        async def on_message(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MESSAGE, arg0)
 
         @self.__bot.event
-        async def on_message_delete(arg0):
+        async def on_message_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MESSAGE_DELETE, arg0)
 
         @self.__bot.event
-        async def on_bulk_message_delete(arg0):
+        async def on_bulk_message_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_BULK_MESSAGE_DELETE, arg0)
 
         @self.__bot.event
-        async def on_raw_message_delete(arg0):
+        async def on_raw_message_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RAW_MESSAGE_DELETE, arg0)
 
         @self.__bot.event
-        async def on_raw_bulk_message_delete(arg0):
+        async def on_raw_bulk_message_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RAW_BULK_MESSAGE_DELETE, arg0)
 
         @self.__bot.event
-        async def on_message_edit(arg0, arg1):
+        async def on_message_edit(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MESSAGE_EDIT, arg0, arg1)
 
         @self.__bot.event
-        async def on_raw_message_edit(arg0):
+        async def on_raw_message_edit(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RAW_MESSAGE_EDIT, arg0)
 
         @self.__bot.event
-        async def on_reaction_add(arg0, arg1):
+        async def on_reaction_add(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_REACTION_ADD, arg0, arg1)
 
         @self.__bot.event
-        async def on_raw_reaction_add(arg0):
+        async def on_raw_reaction_add(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RAW_REACTION_ADD, arg0)
 
         @self.__bot.event
-        async def on_reaction_remove(arg0, arg1):
+        async def on_reaction_remove(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_REACTION_REMOVE, arg0, arg1)
 
         @self.__bot.event
-        async def on_raw_reaction_remove(arg0):
+        async def on_raw_reaction_remove(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RAW_REACTION_REMOVE, arg0)
 
         @self.__bot.event
-        async def on_reaction_clear(arg0, arg1):
+        async def on_reaction_clear(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_REACTION_CLEAR, arg0, arg1)
 
         @self.__bot.event
-        async def on_raw_reaction_clear(arg0):
+        async def on_raw_reaction_clear(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RAW_REACTION_CLEAR, arg0)
 
         @self.__bot.event
-        async def on_reaction_clear_emoji(arg0):
+        async def on_reaction_clear_emoji(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_REACTION_CLEAR_EMOJI, arg0)
 
         @self.__bot.event
-        async def on_raw_reaction_clear_emoji(arg0):
+        async def on_raw_reaction_clear_emoji(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RAW_REACTION_CLEAR_EMOJI, arg0)
 
         @self.__bot.event
-        async def on_private_channel_delete(arg0):
+        async def on_private_channel_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_PRIVATE_CHANNEL_DELETE, arg0)
 
         @self.__bot.event
-        async def on_private_channel_create(arg0):
+        async def on_private_channel_create(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_PRIVATE_CHANNEL_CREATE, arg0)
 
         @self.__bot.event
-        async def on_private_channel_update(arg0, arg1):
+        async def on_private_channel_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_PRIVATE_CHANNEL_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_private_channel_pins_update(arg0, arg1):
+        async def on_private_channel_pins_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_PRIVATE_CHANNEL_PINS_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_guild_channel_create(arg0):
+        async def on_guild_channel_create(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_CHANNEL_CREATE, arg0)
 
         @self.__bot.event
-        async def on_guild_channel_delete(arg0):
+        async def on_guild_channel_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_CHANNEL_DELETE, arg0)
 
         @self.__bot.event
-        async def on_guild_channel_update(arg0, arg1):
+        async def on_guild_channel_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_CHANNEL_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_guild_channel_pins_update(arg0, arg1):
+        async def on_guild_channel_pins_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_CHANNEL_PINS_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_guild_integrations_update(arg0):
+        async def on_guild_integrations_update(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_INTEGRATIONS_UPDATE, arg0)
 
         @self.__bot.event
-        async def on_webhook_update(arg0):
+        async def on_webhook_update(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_WEBHOOK_UPDATE, arg0)
 
         @self.__bot.event
-        async def on_member_join(arg0):
+        async def on_member_join(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MEMBER_JOIN, arg0)
 
         @self.__bot.event
-        async def on_member_remove(arg0):
+        async def on_member_remove(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MEMBER_REMOVE, arg0)
 
         @self.__bot.event
-        async def on_member_update(arg0, arg1):
+        async def on_member_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MEMBER_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_user_update(arg0, arg1):
+        async def on_user_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_USER_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_guild_join(arg0):
+        async def on_guild_join(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_JOIN, arg0)
 
         @self.__bot.event
-        async def on_guild_remove(arg0):
+        async def on_guild_remove(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_REMOVE, arg0)
 
         @self.__bot.event
-        async def on_guild_update(arg0, arg1):
+        async def on_guild_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_guild_role_create(arg0):
+        async def on_guild_role_create(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_ROLE_CREATE, arg0)
 
         @self.__bot.event
-        async def on_guild_role_delete(arg0):
+        async def on_guild_role_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_ROLE_DELETE, arg0)
 
         @self.__bot.event
-        async def on_guild_role_update(arg0, arg1):
+        async def on_guild_role_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_ROLE_UPDATE, arg0, arg1)
 
         @self.__bot.event
-        async def on_guild_emojis_update(arg0):
+        async def on_guild_emojis_update(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_EMOJIS_UPDATE, arg0)
 
         @self.__bot.event
-        async def on_guild_available(arg0):
+        async def on_guild_available(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_AVAILABLE, arg0)
 
         @self.__bot.event
-        async def on_guild_unavailable(arg0):
+        async def on_guild_unavailable(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GUILD_UNAVAILABLE, arg0)
 
         @self.__bot.event
-        async def on_voice_state_update(arg0, arg1, arg2):
+        async def on_voice_state_update(arg0: Any, arg1: Any, arg2: Any) -> None:
             await self.fire_event(DiscordEventType.ON_VOICE_STATE_UPDATE, arg0, arg1, arg2)
 
         @self.__bot.event
-        async def on_member_ban(arg0, arg1):
+        async def on_member_ban(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MEMBER_BAN, arg0, arg1)
 
         @self.__bot.event
-        async def on_member_unban(arg0, arg1):
+        async def on_member_unban(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_MEMBER_UNBAN, arg0, arg1)
 
         @self.__bot.event
-        async def on_invite_create(arg0):
+        async def on_invite_create(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_INVITE_CREATE, arg0)
 
         @self.__bot.event
-        async def on_invite_delete(arg0):
+        async def on_invite_delete(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_INVITE_DELETE, arg0)
 
         @self.__bot.event
-        async def on_group_join(arg0, arg1):
+        async def on_group_join(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GROUP_JOIN, arg0, arg1)
 
         @self.__bot.event
-        async def on_group_remove(arg0, arg1):
+        async def on_group_remove(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_GROUP_REMOVE, arg0, arg1)
 
         @self.__bot.event
-        async def on_relationship_add(arg0):
+        async def on_relationship_add(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RELATIONSHIP_ADD, arg0)
 
         @self.__bot.event
-        async def on_relationship_remove(arg0):
+        async def on_relationship_remove(arg0: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RELATIONSHIP_REMOVE, arg0)
 
         @self.__bot.event
-        async def on_relationship_update(arg0, arg1):
+        async def on_relationship_update(arg0: Any, arg1: Any) -> None:
             await self.fire_event(DiscordEventType.ON_RELATIONSHIP_UPDATE, arg0, arg1)
 
 

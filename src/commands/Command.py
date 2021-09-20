@@ -13,6 +13,6 @@ class WDCommand:
         self.name = name
         self.alias = aliases
 
-    def __call__(self, message: Message):
+    def __call__(self, message: Message) -> None:
         pass
 
