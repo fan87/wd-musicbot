@@ -31,4 +31,4 @@ async def on_command(message: Message, amount: int = 1) -> None:
         else:
             break
 
-    await utils.MessageUtil.reply_fancy_message(":white_check_mark: 成功跳過 " + str(count) + " 首歌曲", discord.Colour.red(), message)
+    await utils.MessageUtil.reply_fancy_message(":white_check_mark: 成功跳過 " + str(count) + " 首歌曲", discord.Colour.green(), message)
