@@ -1,4 +1,6 @@
 from discord.flags import Intents
+
+import dataSaver.BotData
 from music.MusicManager import MusicManager
 from commands.CommandsManager import CommandsManager
 from dataSaver.ConfigsManager import ConfigsManager
@@ -18,6 +20,7 @@ class WDMusicBot(discord.Client):
     musicManager: MusicManager = None
 
     config: BotConfig = BotConfig()
+    data: dataSaver.BotData.MainData = dataSaver.BotData.MainData()
 
     def __init__(self) -> None:
         

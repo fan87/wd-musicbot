@@ -4,7 +4,7 @@ from typing import Any, Optional, Union, cast
 import discord
 import pytube
 import typing
-from discord import voice_client
+from discord import voice_client, Message
 from discord.guild import Guild
 from discord.player import PCMVolumeTransformer
 from discord.voice_client import VoiceClient
@@ -37,7 +37,11 @@ class GuildPlayer:
     tracks: 'list[Track]' = []
     repeat_queue: bool = False
 
-    music_manager = None
+    _music_manager = None
+
+    def get_music_manager(self) -> 'MusicManager':
+        return cast('MusicManager', self._music_manager)
+
 
     def get_current_track(self) -> Union[None, Track]:
         if len(self.tracks) >= 1:
@@ -87,7 +91,7 @@ class GuildPlayer:
             discord.FFmpegPCMAudio(url,
                                    before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
                                    options='-vn'
-                                   )), after=self.__after)
+                                   ), volume=self.get_music_manager().bot.data.get_guild(self.guild)).volume, after=self.__after)
 
     def __play_track(self, track: Track) -> None:
         self.__play_song(track.url)
@@ -147,13 +151,23 @@ class GuildPlayer:
 
 
 class MusicManager:
-    bot = None
+    bot: 'WDMusicBot' = None
     players: list = []
 
     def __init__(self, bot: 'WDMusicBot') -> None:
         self.bot = bot
 
     def get_guild_player(self, guild: Guild) -> GuildPlayer:
+        for player in self.players:
+            guild_player: GuildPlayer = player
+            if guild.id == guild_player.guild.id:
+                return player
+        player: GuildPlayer = GuildPlayer(guild, self)
+        self.players.append(player)
+        return player
+
+    def get_guild_player_by_message(self, message: Message) -> GuildPlayer:
+        guild: Guild = cast(Guild, message.guild)
         for player in self.players:
             guild_player: GuildPlayer = player
             if guild.id == guild_player.guild.id:
