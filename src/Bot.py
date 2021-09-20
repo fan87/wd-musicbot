@@ -1,6 +1,7 @@
 from logging import Logger
 
 from discord.flags import Intents
+from music.MusicManager import MusicManager
 from commands.CommandsManager import CommandsManager
 from dataSaver.ConfigsManager import ConfigsManager
 from events.EventManager import DiscordEventManager, DiscordEventType
@@ -25,6 +26,7 @@ class WDMusicBot(discord.Client):
     eventManager: DiscordEventManager = None
     configsManager: ConfigsManager = None
     commandsManager: CommandsManager = None
+    musicManager: MusicManager = None
 
     config: BotConfig = BotConfig()
 
@@ -38,7 +40,7 @@ class WDMusicBot(discord.Client):
         self.eventManager = DiscordEventManager(self)
         self.configsManager = ConfigsManager(self)
         self.commandsManager = CommandsManager(self, self.config.prefix)
-        
+        self.musicManager = MusicManager(self)
 
         self.commandsManager.init()
 

@@ -25,14 +25,17 @@ class CommandsManager:
     def init(self) -> None:
         from commands.Command import WDCommand
         from Bot import WDMusicBot
-        contents = os.walk("commands/commands/")
+        contents = os.walk("src/commands/commands/")
         for content in contents:
-            path = content[0]
+            path = content[0].replace("src/", "")
             folders = content[1]
             files = content[2]
             for file in files:
                 if file.endswith(".py"):
-                    filepath = path + file.replace(".py", "")
+                    np: str = path
+                    if not np.endswith("/"):
+                        np += "/"
+                    filepath = np + file.replace(".py", "")
                     import_name = filepath.replace("/", ".")
                     module = __import__(import_name)
         bot: WDMusicBot = self.bot
@@ -50,8 +53,11 @@ class CommandsManager:
         command_name: str = content.split(" ")[0]
         command_name = command_name[int(1):int(len(command_name))]
         command: WDCommand = self.find_command(command_name)
+
         if command is None:
             return
+
+        
         await self.invoke(command, message)
 
     async def invoke(self, command, message: Message):
@@ -60,6 +66,7 @@ class CommandsManager:
         for arg in old_arguments:
             if arg != "":
                 arguments.append(arg)
+        
         parameters: list[any] = [message]
         func = self.commands[command]["main"]
         count: int = -2
@@ -134,11 +141,13 @@ class CommandsManager:
 
     def find_command(self, command_name: str) -> any:
         from commands.Command import WDCommand
-
         for command in self.commands.keys():
             cmd: WDCommand = command
             if cmd.name.lower() == command_name.lower():
                 return command
+            for alias in cmd.alias:
+                if alias.lower() == command_name.lower():
+                    return command
         return None
 
 

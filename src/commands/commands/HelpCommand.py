@@ -1,3 +1,4 @@
+from Bot import WDMusicBot
 import discord
 from discord.message import Message
 from commands.CommandsManager import CommandsManager, main_command, register_command

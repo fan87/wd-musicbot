@@ -1,8 +1,5 @@
-from types import coroutine
-import discord
 from discord.message import Message
-import inspect
-from commands.CommandsManager import CommandsManager, main_command
+from commands.CommandsManager import CommandsManager
 
 
 class WDCommand:
