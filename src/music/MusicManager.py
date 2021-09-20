@@ -80,18 +80,19 @@ class GuildPlayer:
 
     def __init__(self, guild: Guild, music_manager: 'MusicManager') -> None:
         self.guild = guild
-        self.music_manager = music_manager
+        self._music_manager = music_manager
 
     def get_voice_client(self) -> VoiceClient:
         return self.guild.voice_client
 
     def __play_song(self, url: str) -> None:
         import InstanceManager
+        print()
         self.get_voice_client().play(discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(url,
                                    before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
                                    options='-vn'
-                                   ), volume=self.get_music_manager().bot.data.get_guild(self.guild)).volume, after=self.__after)
+                                   ), volume=self.get_music_manager().bot.data.get_guild(self.guild).volume), after=self.__after)
 
     def __play_track(self, track: Track) -> None:
         self.__play_song(track.url)
