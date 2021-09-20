@@ -18,7 +18,7 @@ jobs:
         username: ${{secrets.DOCKER_ID}}
         password: ${{secrets.DOCKER_ACCESS_TOKEN}}
     - name: Build the Docker Image
-      run: docker build . --file DockerFiles/Release --tag ${{secrets.DOCKER_ID}}/wd-musicbot:latest
+      run: docker build . --file DockerFiles/GithubRelease --tag ${{secrets.DOCKER_ID}}/wd-musicbot:latest
     - name: Push the Docker Image
       run: docker push ${{secrets.DOCKER_ID}}/wd-musicbot:latest
     - name: Send message to Discord
