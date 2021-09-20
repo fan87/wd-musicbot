@@ -22,4 +22,9 @@ jobs:
     - name: Push the Docker Image
       run: docker push ${{secrets.DOCKER_ID}}/wd-musicbot:latest
     - name: Send message to Discord
-      run: "curl -H 'Content-Type: application/json' -d '{\"content\": \"> **成功建置 Docker Image**\n立刻下載: `docker pull ${{secrets.DOCKER_ID}}/wd-musicbot:latest`\nGithub: https://github.com/fan87/wd-musicbot\"}' ${{secrets.DISCORD_WEBHOOK}}"
+      uses: Ilshidur/action-discord@0.3.2
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: '> 成功上傳至Docker Hub\n下載: `docker pull ${{secrets.DOCKER_ID}}/wd-musicbot:latest`\nGithub: https://github.com/fan87/wd-musicbot'
+
