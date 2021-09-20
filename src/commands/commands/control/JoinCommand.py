@@ -9,17 +9,20 @@ from commands.Command import WDCommand
 @register_command
 class JoinCommand(WDCommand):
     def __init__(self, commandsManager: CommandsManager) -> None:
-        super().__init__(commandsManager, "join", ["j"])
+        super().__init__(commandsManager, "join", ["j", "c", "connect"], category="控制類")
 
-@main_command(description="Join user's channel", head_command=JoinCommand)
+@main_command(description="加入發送訊息者的頻道", head_command=JoinCommand)
 async def join(message: Message) -> None:
+    import InstanceManager
     if message.author.voice is None:
-        return await MessageUtil.reply_fancy_message("請先加入一個語音頻道", discord.Colour.red(), message)
+        await MessageUtil.reply_fancy_message(":x: 請先加入一個語音頻道", discord.Colour.red(), message)
+        return
 
     if message.guild.voice_client is not None:
-        return await MessageUtil.reply_fancy_message("機器人早已在其他頻道", discord.Colour.red(), message)
-
+        await MessageUtil.reply_fancy_message(":x: 機器人早已在其他頻道! 請使用" + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild), discord.Colour.red(), message)
+        return
 
     loop: AbstractEventLoop = asyncio.get_event_loop()
     loop.create_task(message.author.voice.channel.connect())
-    return await MessageUtil.reply_fancy_message("成功加入語音頻道", discord.Colour.green(), message)
+    await MessageUtil.reply_fancy_message(":white_check_mark: 成功加入語音頻道", discord.Colour.green(), message)
+    return

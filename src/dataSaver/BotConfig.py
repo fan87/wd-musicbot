@@ -1,7 +1,7 @@
-from pykson import *
+import pykson
 
 
-class BotConfig(JsonObject):
-    token: str = StringField("token")
-    prefix: str = StringField("prefix")
+class BotConfig(pykson.JsonObject):
+    token: str = pykson.StringField("token")
+    prefix: str = pykson.StringField("prefix")
 

@@ -26,5 +26,5 @@ jobs:
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       with:
-        args: '> 成功上傳至Docker Hub\n下載: `docker pull ${{secrets.DOCKER_ID}}/wd-musicbot:latest`\nGithub: https://github.com/fan87/wd-musicbot'
+        args: '> 成功上傳至Docker Hub    下載: `docker pull ${{secrets.DOCKER_ID}}/wd-musicbot:latest`    Github: https://github.com/fan87/wd-musicbot'
 

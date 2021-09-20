@@ -1,7 +1,10 @@
-
+import asyncio
 import functools
+from asyncio import AbstractEventLoop
 from typing import TYPE_CHECKING, Any, Callable
 import typing
+
+import discord.user
 from discord.channel import TextChannel
 from discord.member import Member
 from discord.message import Message
@@ -27,6 +30,8 @@ class CommandsManager:
         self.bot = bot
         self.prefix = prefix
 
+    def get_prefix(self, guild: typing.Union[discord.Guild, Any]) -> str:
+        return self.prefix
         
     def init(self) -> None:
         from commands.Command import WDCommand
@@ -53,7 +58,7 @@ class CommandsManager:
         if user.bot:
             return
         content: str = message.content
-        if not content.startswith(self.prefix):
+        if not content.startswith(self.get_prefix(message.guild)):
             channel: TextChannel = message.channel
             return
         command_name: str = content.split(" ")[0]
@@ -87,7 +92,10 @@ class CommandsManager:
                 try:
                     arguments[count]
                 except:
-                    parameters.append(None)
+                    if not para.default == para.empty:
+                        parameters.append(para.default)
+                    else:
+                        parameters.append(None)
                     continue
                 try:
                     type: str = str(para).replace(" ", "").split(":")[1]
@@ -101,6 +109,8 @@ class CommandsManager:
                     arguments[count]
                 except:
                     starstarpara = None
+                    if not para.default == para.empty:
+                        starstarpara = para.default
                     continue
                 i: int = -1
                 argument: str = ""
@@ -115,11 +125,14 @@ class CommandsManager:
                     starstarpara = self.convert(message, argument, type)
                 except:
                     starstarpara = argument
-                break;
+                break
+
         if starstar != "":
-            await func(*parameters, **{starstar: starstarpara})
+            loop: AbstractEventLoop = asyncio.get_event_loop()
+            loop.create_task(func(*parameters, **{starstar: starstarpara}))
         else:
-            await func(*parameters)
+            loop = asyncio.get_event_loop()
+            loop.create_task(func(*parameters))
 
 
     def convert(self, message: Message, stringIn: str, typeIn: str) -> Any:
@@ -133,15 +146,27 @@ class CommandsManager:
             return float(stringIn)
         if typeIn == "bool":
             return bool(stringIn)
-        if typeIn == "discord.member.Member":
+
+        if typeIn == "discord.user.User" or typeIn == "discord.User":
             if stringIn.startswith("<@!") and stringIn.endswith(">"):
-                id: str = stringIn[3:-1]
-                member: Member = InstanceManager.mainInstance.get_user(int(id))
+                uid: str = stringIn[3:-1]
+                member: Member = InstanceManager.mainInstance.get_user(int(uid))
                 return member
             if stringIn.startswith("<@") and stringIn.endswith(">"):
-                id = stringIn[2:-1]
-                member = InstanceManager.mainInstance.get_user(int(id))
+                uid = stringIn[2:-1]
+                member = InstanceManager.mainInstance.get_user(int(uid))
                 return member
+
+        if typeIn == "discord.member.Member" or typeIn == "discord.Member":
+            if stringIn.startswith("<@!") and stringIn.endswith(">"):
+                uid = stringIn[3:-1]
+                member = message.guild.get_member(int(uid))
+                return member
+            if stringIn.startswith("<@") and stringIn.endswith(">"):
+                uid = stringIn[2:-1]
+                member = message.guild.get_member(int(uid))
+                return member
+
         return None
 
 

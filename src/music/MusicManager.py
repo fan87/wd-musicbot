@@ -2,6 +2,8 @@ import random
 from locale import Error
 from typing import Any, Optional, Union, cast
 import discord
+import pytube
+import typing
 from discord import voice_client
 from discord.guild import Guild
 from discord.player import PCMVolumeTransformer
@@ -10,6 +12,8 @@ from pytube.__main__ import YouTube
 from pytube.streams import Stream
 
 from typing import TYPE_CHECKING
+
+import youtube.YoutubeAPI
 
 if TYPE_CHECKING:
     from Bot import WDMusicBot
@@ -77,32 +81,61 @@ class GuildPlayer:
 
     def __play_song(self, url: str) -> None:
         import InstanceManager
-        self.get_voice_client().play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url)), after=self.__after)
+        self.get_voice_client().play(discord.PCMVolumeTransformer(
+            discord.FFmpegPCMAudio(url,
+                                   before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+                                   options='-vn'
+                                   )), after=self.__after)
 
     def __play_track(self, track: Track) -> None:
         self.__play_song(track.url)
 
-    def __after(self, error: Error) -> None:
-        self.skip()
+    skipped: bool = False
 
-    def add_to_queue(self, track: Track) -> None:
+    def __after(self, error: Error) -> None:
+        if not self.skipped:
+            print("After")
+            if self.get_current_track() is None:
+                return
+
+            self.tracks.pop(0)
+            if self.get_current_track() is not None:
+                track: Optional[Track] = self.get_current_track()
+                self.get_voice_client().stop()
+                self.__play_track(cast(Track, track))
+            return
+
+    def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:
             self.tracks.append(track)
-            print("Play Track")
             self.__play_track(track)
+            return True
         else:
             self.tracks.append(track)
+            return False
 
-    def skip(self) -> None:
+    def skip(self) -> bool:
+        if self.get_current_track() is None:
+            return False
+
         self.tracks.pop(0)
         if self.get_current_track() is not None:
             track: Optional[Track] = self.get_current_track()
+            self.skipped = True
+            self.get_voice_client().stop()
             self.__play_track(cast(Track, track))
+        return True
 
-    def get_track_from_youtube(self, youtube_url: str) -> Track:
+    async def get_track_from_youtube(self, youtube_url: str) -> Track:
         yt: YouTube = YouTube(youtube_url)
-        stream: Stream = yt.streams.get_by_itag(251)
-        return Track(yt.title, yt.author, stream.url, yt.length)
+        url = await youtube.YoutubeAPI.get_dir_url(251, yt.video_id)
+        return Track(yt.title, yt.author, str(url), yt.length)
+
+
+    async def get_track_from_youtube_pytube(self, yt: pytube.YouTube) -> Track:
+        url = await youtube.YoutubeAPI.get_dir_url(251, yt.video_id)
+        return Track(yt.title, yt.author, str(url), yt.length)
+
 
 
 class MusicManager:
@@ -120,3 +153,4 @@ class MusicManager:
         player: GuildPlayer = GuildPlayer(guild, self)
         self.players.append(player)
         return player
+
