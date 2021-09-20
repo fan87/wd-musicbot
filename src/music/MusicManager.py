@@ -51,6 +51,8 @@ class GuildPlayer:
     def next(self) -> Union[None, Track]:
         if self.repeat_queue:
             self.tracks.append(self.tracks.pop(0))
+        else:
+            self.tracks.pop(0)
 
         if len(self.tracks) >= 1:
             return self.tracks[0]
@@ -123,9 +125,10 @@ class GuildPlayer:
             next: Track = typing.cast(Track, self.next())
             self.__play_track(cast(Track, next))
             return True
-
-        if self.get_current_track() is None:
+        else:
             return False
+
+
 
 
     async def get_track_from_youtube(self, youtube_url: str) -> Track:

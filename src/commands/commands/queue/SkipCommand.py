@@ -24,7 +24,7 @@ async def on_command(message: Message, amount: int = 1) -> None:
     if InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild)).get_current_track() is None:
         await MessageUtil.reply_fancy_message(":x: 機器人並未播放任何歌曲! 請使用 " + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild) + "play 讓機器人開始播放音樂", discord.Colour.red(), message)
         return
-    count: int = 1
+    count: int = 0
     for i in range(amount):
         if InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild)).skip():
             count += 1
