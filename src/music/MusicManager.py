@@ -94,6 +94,7 @@ class GuildPlayer:
 
     def __after(self, error: Error) -> None:
         if not self.skipped:
+            self.skipped = False
             if self.get_current_track() is None:
                 return
 
@@ -114,16 +115,18 @@ class GuildPlayer:
             return False
 
     def skip(self) -> bool:
+        if self.get_voice_client().is_playing():
+            self.skipped = True
+            self.get_voice_client().stop()
+
+        if self.has_next():
+            next: Track = typing.cast(Track, self.next())
+            self.__play_track(cast(Track, next))
+            return True
+
         if self.get_current_track() is None:
             return False
 
-        self.tracks.pop(0)
-        if self.get_current_track() is not None:
-            track: Optional[Track] = self.get_current_track()
-            self.skipped = True
-            self.get_voice_client().stop()
-            self.__play_track(cast(Track, track))
-        return True
 
     async def get_track_from_youtube(self, youtube_url: str) -> Track:
         yt: YouTube = YouTube(youtube_url)
