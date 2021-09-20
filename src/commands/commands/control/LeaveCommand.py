@@ -1,6 +1,8 @@
 import asyncio
 from asyncio.events import AbstractEventLoop
 
+import typing
+
 import InstanceManager
 from utils import MessageUtil
 import discord
@@ -23,5 +25,7 @@ async def leave(message: Message) -> None:
     loop: AbstractEventLoop = asyncio.get_event_loop()
     loop.create_task(message.author.voice.channel.connect())
     await message.guild.voice_client.disconnect()
+    guild_player = InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild))
+    guild_player.tracks.clear()
     await MessageUtil.reply_fancy_message(":white_check_mark: 已經退出語音頻道了! 感謝您的使用 :partying_face: ", discord.Colour.green(), message)
     return

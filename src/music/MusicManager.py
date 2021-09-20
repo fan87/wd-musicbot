@@ -53,10 +53,9 @@ class GuildPlayer:
         return len(self.tracks) >= 2
 
     def next(self) -> Union[None, Track]:
+        old_track: Track = self.tracks.pop(0)
         if self.repeat_queue:
-            self.tracks.append(self.tracks.pop(0))
-        else:
-            self.tracks.pop(0)
+            self.tracks.append(old_track)
 
         if len(self.tracks) >= 1:
             return self.tracks[0]
@@ -64,7 +63,17 @@ class GuildPlayer:
             return None
 
     def shuffle(self) -> None:
-        random.shuffle(self.tracks)
+        if len(self.tracks) <= 1:
+            pass
+        shuffle = []
+        for track in self.tracks:
+            shuffle.append(track)
+        shuffle.pop(0)
+        random.shuffle(shuffle)
+        new_tracks = [self.tracks[0]]
+        for track in shuffle:
+            new_tracks.append(track)
+        self.tracks = new_tracks
         return None
 
     def __remove(self, index: int) -> Union[Track, None]:
@@ -102,15 +111,13 @@ class GuildPlayer:
     def __after(self, error: Error) -> None:
         if not self.skipped:
             self.skipped = False
-            if self.get_current_track() is None:
-                return
+            next_track: Union[Track, None] = self.next()
+            if not next_track is None:
+                self.__play_track(cast(Track, next_track))
+            else:
+                if len(self.tracks) == 1:
+                    self.tracks.pop(0)
 
-            self.tracks.pop(0)
-            if self.get_current_track() is not None:
-                track: Optional[Track] = self.get_current_track()
-                self.get_voice_client().stop()
-                self.__play_track(cast(Track, track))
-            return
 
     def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:
@@ -126,9 +133,9 @@ class GuildPlayer:
             self.skipped = True
             self.get_voice_client().stop()
 
-        if self.has_next():
-            next: Track = typing.cast(Track, self.next())
-            self.__play_track(cast(Track, next))
+        next_track: Union[Track, None] = self.next()
+        if not next_track is None:
+            self.__play_track(cast(Track, next_track))
             return True
         else:
             if len(self.tracks) == 1:
