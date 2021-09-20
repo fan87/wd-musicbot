@@ -42,9 +42,9 @@ docker -it fan87/wd-musicbot:latest
 ### 第三步: 設置
 您將需要輸入Discord機器人的Token和Prefix。機器人Token取得方式網路上都有，可以自行搜尋，Prefix就是指令前綴，例如: `!play`的前綴就是`!`<br><br><br>
 ![](https://cdn.discordapp.com/attachments/869133787085287464/889572582100185119/unknown.png)
-⬆️ 啟動時大概會長這樣
+<br>⬆️ 啟動時大概會長這樣
 
-> 詳係說明請閱讀啟動容器後顯示的文字
+> 詳細說明請閱讀啟動容器後顯示的文字
 
 ### 第四步: 關閉
 若機器人仍在開啟狀態，您必須按Ctrl + C來停止機器人<br>
@@ -57,7 +57,7 @@ docker -it fan87/wd-musicbot:latest
 docker ps -a
 ```
 ![](https://cdn.discordapp.com/attachments/869133787085287464/889573696883286108/unknown.png)
-在這邊可以看到IMAGE一欄，找到`fan87/wd-musicbot:latest` 或者類似的東西<br>
+<br>在這邊可以看到IMAGE一欄，找到`fan87/wd-musicbot:latest` 或者類似的東西<br>
 輸入以下指令停止容器:
 ```shell
 docker container stop <容器ID>
