@@ -216,9 +216,7 @@ class GuildPlayer:
         if next_track is None:
             return False
         else:
-
-            self.play_track(cast(Track, next_track))
-
+            self.play_track(cast(Track, self.get_current_track()))
             return True
 
     async def get_track_from_youtube(self, youtube_url: str) -> Track:
