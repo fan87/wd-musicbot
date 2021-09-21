@@ -47,14 +47,6 @@ async def on_command(message: Message, *, cmd: str) -> None:
             out = [None, None]
             await message.channel.send(str(await async_exec(cmd, ex_locals)))
         except Exception as err:
-            await message.channel.send("Something went wrong: " + str(err) + "\n\n" + "Please use this template: " + """
-            
-            ```python
-            async def async_out():
-                return None
-            def main():
-                return None
-            ```
-            """)
+            await message.channel.send("Something went wrong: " + str(err))
     else:
         await wdutils.MessageUtil.reply_fancy_message(":x: 您不是開發者", discord.Colour.red(), message)
