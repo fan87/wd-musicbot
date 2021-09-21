@@ -23,6 +23,9 @@ class WDVolumeTransformer(discord.player.PCMVolumeTransformer):
 
     time: int = 0
 
+    def set_bass(self, value: float) -> None:
+        self.original.set_bass(value, self.time)
+
     def __init__(self, original: 'WDFFmpegAudio', volume: float=float(1.0)) -> None:
         if not isinstance(original, discord.AudioSource):
             raise TypeError('expected AudioSource not {0.__class__.__name__}.'.format(original))
@@ -119,6 +122,9 @@ class WDFFmpegAudio(discord.AudioSource):
 
         self.process = self.stdout = None
 
+    def set_bass(self, value: float, time: int) -> None:
+        raise NotImplementedError()
+
 class WDFFmpegPCMAudio(WDFFmpegAudio):
 
 
@@ -162,3 +168,19 @@ class WDFFmpegPCMAudio(WDFFmpegAudio):
 
     def is_opus(self) -> bool:
         return False
+
+
+    def set_bass(self, value: float, time: int) -> None:
+        args: list[str] = list[str]()
+        i: int = 0
+        for arg in self.args:
+            i += 1
+            args.append(arg)
+            if i == 1:
+                args.append("-ss")
+                args.append(wdutils.TimeParser.parse_milli(time))
+            if arg == "warning":
+                args.append("-af")
+                args.append(f"bass=g={min(max(value, -20), 20)}")
+        self.process = self.spawn_process(args, **self.kwargs)
+        self.stdout = self.process.stdout

@@ -100,10 +100,13 @@ async def get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
     async with aiohttp.ClientSession() as session:
         async with session.post(f"https://youtubei.googleapis.com/youtubei/v1/player?key={API_KEY}&contentCheckOk=true&racyCheckOk=true", json=body) as response:
             json_body = await response.json()
-            for format in json_body["streamingData"]["adaptiveFormats"]:
-                try:
-                    if int(format["itag"]) == itag:
-                        return format["url"]
-                except:
-                    pass
+            try:
+                for format in json_body["streamingData"]["adaptiveFormats"]:
+                    try:
+                        if int(format["itag"]) == itag:
+                            return format["url"]
+                    except:
+                        pass
+            except:
+                return pytube.YouTube("https://www.youtube.com/watch?v=" + video_id).streams.get_by_itag(itag).url
     return None

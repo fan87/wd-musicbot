@@ -42,7 +42,23 @@ class GuildPlayer:
     guild: Guild = None
     repeat_queue: bool = False
 
+
+
     _music_manager = None
+    _bass: float = 0
+
+    @property
+    def bass(self) -> float:
+        return self._bass
+
+    @bass.setter
+    def bass(self, value: float) -> None:
+        self._bass = value
+        try:
+            self.get_audio_source().set_bass(value)
+        except:
+            pass
+
 
     @property
     def tracks(self) -> list[Track]:
@@ -134,6 +150,7 @@ class GuildPlayer:
                                                      ),
                 volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
                 after=self.__after)
+            self.get_audio_source().set_bass(self.bass)
         except Error as er:
             print(er)
 
