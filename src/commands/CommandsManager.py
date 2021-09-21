@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class CommandsManager:
-    bot = None
+    bot: 'WDMusicBot' = None
 
     commands: dict = {}
     prefix: str = ""
@@ -58,6 +58,9 @@ class CommandsManager:
         if user.bot:
             return
         content: str = message.content
+        bot_user: User = self.bot.user
+        if content == bot_user.mention:
+            await message.reply("哈囉! 我的指令前綴是 " + self.get_prefix(message.guild) + "  請使用 " + self.get_prefix(message.guild) + "help 來查看指令清單")
         if not content.startswith(self.get_prefix(message.guild)):
             channel: TextChannel = message.channel
             return

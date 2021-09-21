@@ -1,4 +1,6 @@
+import asyncio
 import random
+import threading
 from locale import Error
 from typing import Any, Optional, Union, cast
 import discord
@@ -13,6 +15,7 @@ from pytube.streams import Stream
 
 from typing import TYPE_CHECKING
 
+import music.WDVolumeTransformer
 import youtube.YoutubeAPI
 
 if TYPE_CHECKING:
@@ -22,13 +25,13 @@ if TYPE_CHECKING:
 class Track:
     name: str = ""
     author: str = ""
-    url: str = ""
+    video_id: str = ""
     length: int = 0  # Unit: Sec
 
-    def __init__(self, name: str, author: str, url: str, length: int) -> None:
+    def __init__(self, name: str, author: str, video_id: str, length: int) -> None:
         self.name = name
         self.author = author
-        self.url = url
+        self.video_id = video_id
         self.length = length
 
 
@@ -41,7 +44,6 @@ class GuildPlayer:
 
     def get_music_manager(self) -> 'MusicManager':
         return cast('MusicManager', self._music_manager)
-
 
     def get_current_track(self) -> Union[None, Track]:
         if len(self.tracks) >= 1:
@@ -94,35 +96,39 @@ class GuildPlayer:
     def get_voice_client(self) -> VoiceClient:
         return self.guild.voice_client
 
-    def __play_song(self, url: str) -> None:
+    async def __play_song(self, video_id: str) -> None:
         import InstanceManager
-        print()
-        self.get_voice_client().play(discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(url,
+        dir_url = await youtube.YoutubeAPI.get_dir_url(251, video_id)
+        self.get_voice_client().play(music.WDVolumeTransformer.WDVolumeTransformer(
+            discord.FFmpegPCMAudio(dir_url,
                                    before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
                                    options='-vn'
-                                   ), volume=self.get_music_manager().bot.data.get_guild(self.guild).volume), after=self.__after)
+                                   ), volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
+            after=self.__after)
 
-    def __play_track(self, track: Track) -> None:
-        self.__play_song(track.url)
+    async def __play_track(self, track: Track) -> None:
+        await self.__play_song(track.video_id)
 
     skipped: bool = False
 
     def __after(self, error: Error) -> None:
         if not self.skipped:
-            self.skipped = False
-            next_track: Union[Track, None] = self.next()
-            if not next_track is None:
-                self.__play_track(cast(Track, next_track))
-            else:
-                if len(self.tracks) == 1:
-                    self.tracks.pop(0)
+            self.skip()
+        # if not self.skipped:
+        #     self.skipped = False
+        #     next_track: Union[Track, None] = self.next()
+        #     print(next_track)
+        #     if next_track is not None:
+        #         loop = asyncio.get_event_loop()
+        #         loop.create_task(self.__play_track(next_track))
+        #     else:
+        #         if len(self.tracks) == 1:
+        #             self.tracks.pop(0)
 
-
-    def add_to_queue(self, track: Track) -> bool:
+    async def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:
             self.tracks.append(track)
-            self.__play_track(track)
+            await self.__play_track(track)
             return True
         else:
             self.tracks.append(track)
@@ -134,28 +140,28 @@ class GuildPlayer:
             self.get_voice_client().stop()
 
         next_track: Union[Track, None] = self.next()
-        if not next_track is None:
-            self.__play_track(cast(Track, next_track))
-            return True
-        else:
-            if len(self.tracks) == 1:
-                self.tracks.pop(0)
-                return True
+        if next_track is None:
             return False
+        else:
+            print(next_track.name)
 
+            def play_track() -> None:
+                loop = asyncio.new_event_loop()
+                future = loop.create_task(self.__play_track(cast(Track, next_track)))
+                loop.run_until_complete(future)
+                loop.close()
 
+            thread: threading.Thread = threading.Thread(target=play_track)
+            thread.start()
 
+            return True
 
     async def get_track_from_youtube(self, youtube_url: str) -> Track:
         yt: YouTube = YouTube(youtube_url)
-        url = await youtube.YoutubeAPI.get_dir_url(251, yt.video_id)
-        return Track(yt.title, yt.author, str(url), yt.length)
-
+        return Track(yt.title, yt.author, str(yt.video_id), yt.length)
 
     async def get_track_from_youtube_pytube(self, yt: pytube.YouTube) -> Track:
-        url = await youtube.YoutubeAPI.get_dir_url(251, yt.video_id)
-        return Track(yt.title, yt.author, str(url), yt.length)
-
+        return Track(yt.title, yt.author, str(yt.video_id), yt.length)
 
 
 class MusicManager:
@@ -183,4 +189,3 @@ class MusicManager:
         player: GuildPlayer = GuildPlayer(guild, self)
         self.players.append(player)
         return player
-

@@ -27,6 +27,7 @@ class PlayCommand(WDCommand):
 async def on_command(message: Message, *, song: str) -> None:
     import InstanceManager
 
+
     guild_player: GuildPlayer = InstanceManager.mainInstance.musicManager.get_guild_player(
         cast(discord.Guild, message.guild))
 
@@ -40,7 +41,6 @@ async def on_command(message: Message, *, song: str) -> None:
 
     try:
         yt: pytube.YouTube = pytube.YouTube(song)
-        await utils.MessageUtil.reply_fancy_message(":mag: 取得影片資訊中...", discord.Colour.gold(), message)
     except:
         await utils.MessageUtil.reply_fancy_message(":mag: 搜尋中...", discord.Colour.gold(), message)
 
@@ -51,13 +51,13 @@ async def on_command(message: Message, *, song: str) -> None:
             return
         yt = result.videos[0]
     track: Track = await guild_player.get_track_from_youtube_pytube(yt)
-    if guild_player.add_to_queue(track):
+    if await guild_player.add_to_queue(track):
         embed: discord.Embed = discord.Embed()
         embed.title = yt.title
         embed.set_author(name=yt.author)
         embed.description = ":play_pause: 正在播放 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
-        embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hqdefault.jpg")
+        embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hq720.jpg")
         await message.reply(embed=embed, mention_author=False)
     else:
         embed = discord.Embed()
@@ -65,5 +65,5 @@ async def on_command(message: Message, *, song: str) -> None:
         embed.set_author(name=yt.author)
         embed.description = ":white_check_mark: 已經排序 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
-        embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hqdefault.jpg")
+        embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hq720.jpg")
         await message.reply(embed=embed, mention_author=False)

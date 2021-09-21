@@ -42,7 +42,7 @@ class WDMusicBot(discord.Client):
         
 
     def register_listeners(self) -> None:
-        self.eventManager.add_listener(DiscordEventType.ON_READY, self.ready_handling)
+        self.eventManager.add_listener(DiscordEventType.ON_CONNECT, self.ready_handling)
 
     def start_bot(self) -> None:
         self.run(self.config.token)

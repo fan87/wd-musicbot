@@ -14,7 +14,7 @@ from utils import MessageUtil
 @register_command
 class SkipCommand(commands.Command.WDCommand):
     def __init__(self, commandsManager: CommandsManager) -> None:
-        super().__init__(commandsManager, "skip", [], "待播清單控制類")
+        super().__init__(commandsManager, "skip", ["next"], "待播清單控制類")
 
 @main_command("跳過歌曲", SkipCommand, amount="歌曲數量")
 async def on_command(message: Message, amount: int = 1) -> None:
