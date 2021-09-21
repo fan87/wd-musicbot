@@ -27,5 +27,6 @@ async def leave(message: Message) -> None:
     await message.guild.voice_client.disconnect()
     guild_player = InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild))
     guild_player.tracks.clear()
+    InstanceManager.mainInstance.data.get_guild(message.guild).last_vc = 0
     await MessageUtil.reply_fancy_message(":white_check_mark: 已經退出語音頻道了! 感謝您的使用 :partying_face: ", discord.Colour.green(), message)
     return

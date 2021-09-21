@@ -21,7 +21,8 @@ async def join(message: Message) -> None:
     if message.guild.voice_client is not None:
         await MessageUtil.reply_fancy_message(":x: 機器人早已在其他頻道! 請使用" + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild), discord.Colour.red(), message)
         return
-
+    InstanceManager.mainInstance.data.get_guild(message.guild).last_vc = message.author.voice.channel.id
+    InstanceManager.mainInstance.configsManager.save_data()
     loop: AbstractEventLoop = asyncio.get_event_loop()
     loop.create_task(message.author.voice.channel.connect())
     await MessageUtil.reply_fancy_message(":white_check_mark: 成功加入語音頻道", discord.Colour.green(), message)

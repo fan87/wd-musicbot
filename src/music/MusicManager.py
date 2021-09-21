@@ -4,6 +4,7 @@ import threading
 from locale import Error
 from typing import Any, Optional, Union, cast
 import discord
+import pykson
 import pytube
 import typing
 from discord import voice_client, Message
@@ -17,18 +18,20 @@ from typing import TYPE_CHECKING
 
 import music.WDAudioSource
 import youtube.YoutubeAPI
+from events.EventManager import DiscordEventType
 
 if TYPE_CHECKING:
     from Bot import WDMusicBot
 
 
-class Track:
-    name: str = ""
-    author: str = ""
-    video_id: str = ""
-    length: int = 0  # Unit: Sec
+class Track(pykson.JsonObject):
+    name: str = pykson.StringField()
+    author: str = pykson.StringField()
+    video_id: str = pykson.StringField()
+    length: int = pykson.IntegerField()  # Unit: Sec
 
-    def __init__(self, name: str, author: str, video_id: str, length: int) -> None:
+    def __init__(self, name: str, author: str, video_id: str, length: int, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
         self.name = name
         self.author = author
         self.video_id = video_id
@@ -37,10 +40,18 @@ class Track:
 
 class GuildPlayer:
     guild: Guild = None
-    tracks: 'list[Track]' = []
     repeat_queue: bool = False
 
     _music_manager = None
+
+    @property
+    def tracks(self) -> list[Track]:
+        return self.get_music_manager().bot.data.get_guild(self.guild).queue
+
+    @tracks.setter
+    def tracks(self, queue: list[Track]) -> None:
+        self.get_music_manager().bot.data.get_guild(self.guild).queue = queue
+        self.get_music_manager().bot.configsManager.save_data()
 
     def get_audio_source(self) -> music.WDAudioSource.WDVolumeTransformer:
         return self.get_voice_client().source
@@ -57,10 +68,19 @@ class GuildPlayer:
     def has_next(self) -> bool:
         return len(self.tracks) >= 2
 
+    def append(self, track: Track) -> None:
+        self.tracks.append(track)
+        self.get_music_manager().bot.configsManager.save_data()
+
+    def pop(self, index: int) -> Track:
+        track = self.tracks.pop(index)
+        self.get_music_manager().bot.configsManager.save_data()
+        return track
+
     def next(self) -> Union[None, Track]:
-        old_track: Track = self.tracks.pop(0)
+        old_track: Track = self.pop(0)
         if self.repeat_queue:
-            self.tracks.append(old_track)
+            self.append(old_track)
 
         if len(self.tracks) >= 1:
             return self.tracks[0]
@@ -87,7 +107,7 @@ class GuildPlayer:
             if index == 0:
                 self.skip()
                 return track
-            self.tracks.pop(index)
+            self.pop(index)
             return track
         except:
             return None
@@ -110,7 +130,7 @@ class GuildPlayer:
             volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
             after=self.__after)
 
-    async def __play_track(self, track: Track) -> None:
+    async def play_track(self, track: Track) -> None:
         await self.__play_song(track.video_id)
 
     skipped: bool = False
@@ -119,14 +139,13 @@ class GuildPlayer:
         if not self.skipped:
             self.skip()
 
-
     async def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:
-            self.tracks.append(track)
-            await self.__play_track(track)
+            self.append(track)
+            await self.play_track(track)
             return True
         else:
-            self.tracks.append(track)
+            self.append(track)
             return False
 
     def skip(self) -> bool:
@@ -143,7 +162,7 @@ class GuildPlayer:
 
             def play_track() -> None:
                 loop = asyncio.new_event_loop()
-                future = loop.create_task(self.__play_track(cast(Track, next_track)))
+                future = loop.create_task(self.play_track(cast(Track, next_track)))
                 loop.run_until_complete(future)
                 loop.close()
 
@@ -166,6 +185,25 @@ class MusicManager:
 
     def __init__(self, bot: 'WDMusicBot') -> None:
         self.bot = bot
+        bot.eventManager.add_listener(DiscordEventType.ON_READY, self.ready)
+
+    async def ready(self) -> None:
+        bot = self.bot
+        for guild in bot.data.guilds:
+            print(guild.guild_id)
+            if guild.last_vc != 0:
+                try:
+                    dcguild: Guild = bot.get_guild(guild.guild_id)
+                    channel: discord.VoiceChannel = dcguild.get_channel(guild.last_vc)
+                    await channel.connect()
+                    guild_player: GuildPlayer = self.get_guild_player(dcguild)
+                    if len(guild_player.tracks) >= 1:
+                        await guild_player.play_track(cast(Track, guild_player.get_current_track()))
+                    else:
+                        raise Error()
+                except Error as err:
+                    guild.last_vc = 0
+                    bot.configsManager.save_data()
 
     def get_guild_player(self, guild: Guild) -> GuildPlayer:
         for player in self.players:

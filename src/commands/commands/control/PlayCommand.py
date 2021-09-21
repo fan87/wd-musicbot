@@ -36,6 +36,8 @@ async def on_command(message: Message, *, song: str) -> None:
         return
 
     if message.guild.voice_client is None:
+        InstanceManager.mainInstance.data.get_guild(message.guild).last_vc = message.author.voice.channel.id
+        InstanceManager.mainInstance.configsManager.save_data()
         await message.author.voice.channel.connect()
         await utils.MessageUtil.reply_fancy_message(":white_check_mark: 成功加入語音頻道", discord.Colour.green(), message)
 
@@ -43,7 +45,6 @@ async def on_command(message: Message, *, song: str) -> None:
         yt: pytube.YouTube = pytube.YouTube(song)
     except:
         await utils.MessageUtil.reply_fancy_message(":mag: 搜尋中...", discord.Colour.gold(), message)
-
         result: youtube.YoutubeAPI.Search = await youtube.YoutubeAPI.search(song)
 
         if len(result.videos) <= 0:

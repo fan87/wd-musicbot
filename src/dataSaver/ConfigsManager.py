@@ -1,3 +1,4 @@
+import json
 import typing
 from typing import IO
 
@@ -36,8 +37,8 @@ class ConfigsManager:
             data_file.close()
         except:
             bot.data.guilds = []
-            open("run/data.json", "w").write(Pykson().to_json(bot.data))
+            open("run/data.json", "w").write(json.dumps(json.loads(Pykson().to_json(self.bot.config)), indent=4, sort_keys=True))
 
     def save_data(self) -> 'MainData':
-        open("run/data.json", "w").write(Pykson().to_json(self.bot.data))
+        open("run/data.json", "w").write(json.dumps(json.loads(Pykson().to_json(self.bot.data)), indent=4, sort_keys=True))
         return self.bot.data
