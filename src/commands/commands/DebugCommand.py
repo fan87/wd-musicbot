@@ -40,7 +40,7 @@ out: list[typing.Any] = [None, None]
 async def on_command(message: Message, *, cmd: str) -> None:
     if message.author.id in InstanceManager.mainInstance.config.owner:
         try:
-            globals().update({"bot": InstanceManager.mainInstance})
+            globals().update({"bot": InstanceManager.mainInstance, "message": message})
             ex_locals: dict = {"bot": InstanceManager.mainInstance, "message": message}
             in_locals = {"bot": InstanceManager.mainInstance, "message": message, "input": None}
             in_locals.update(globals())
