@@ -14,6 +14,7 @@ import discord
 from discord.message import Message
 from commands.CommandsManager import CommandsManager, main_command, register_command
 from music.MusicManager import GuildPlayer, MusicManager, Track
+from utils import MessageUtil
 from utils.override import override
 from commands.Command import WDCommand
 
@@ -34,12 +35,16 @@ async def on_command(message: Message, *, song: str) -> None:
     if song is None:
         await utils.MessageUtil.reply_fancy_message(":x: 請輸入要播放的`歌名/URL`", discord.Colour.red(), message)
         return
-
     if message.guild.voice_client is None:
         InstanceManager.mainInstance.data.get_guild(message.guild).last_vc = message.author.voice.channel.id
         InstanceManager.mainInstance.configsManager.save_data()
         await message.author.voice.channel.connect()
         await utils.MessageUtil.reply_fancy_message(":white_check_mark: 成功加入語音頻道", discord.Colour.green(), message)
+
+    if message.author.voice.channel != guild_player.get_voice_client().channel:
+        await MessageUtil.reply_fancy_message(":x: 機器人早已在其他頻道! 請使用" + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild) + "leave", discord.Colour.red(), message)
+        return
+
 
     try:
         yt: pytube.YouTube = pytube.YouTube(song)

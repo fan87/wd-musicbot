@@ -19,7 +19,7 @@ async def join(message: Message) -> None:
         return
 
     if message.guild.voice_client is not None:
-        await MessageUtil.reply_fancy_message(":x: 機器人早已在其他頻道! 請使用" + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild), discord.Colour.red(), message)
+        await MessageUtil.reply_fancy_message(":x: 機器人早已在其他頻道! 請使用" + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild) + "leave", discord.Colour.red(), message)
         return
     InstanceManager.mainInstance.data.get_guild(message.guild).last_vc = message.author.voice.channel.id
     InstanceManager.mainInstance.configsManager.save_data()

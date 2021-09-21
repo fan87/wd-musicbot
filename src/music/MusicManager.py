@@ -196,7 +196,6 @@ class MusicManager:
         bot = self.bot
         bot.ready = True
         for guild in bot.data.guilds:
-            print(guild.guild_id)
             if guild.last_vc != 0:
                 try:
                     dcguild: Guild = bot.get_guild(guild.guild_id)
