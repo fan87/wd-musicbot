@@ -77,6 +77,10 @@ class GuildPlayer:
         self.get_music_manager().bot.configsManager.save_data()
         return track
 
+    def clear(self) -> None:
+        self.tracks.clear()
+        self.get_music_manager().bot.configsManager.save_data()
+
     def next(self) -> Union[None, Track]:
         old_track: Track = self.pop(0)
         if self.repeat_queue:
@@ -150,7 +154,8 @@ class GuildPlayer:
 
     def skip(self) -> bool:
         if self.get_voice_client() is None:
-            self.tracks.clear()
+            self.clear()
+            return False
         if self.get_voice_client().is_playing():
             self.skipped = True
             self.get_voice_client().stop()

@@ -28,6 +28,6 @@ async def on_command(message: Message, amount: int = 1) -> None:
         return
 
     length: int = len(guild_player.tracks)
-    guild_player.tracks.clear()
+    guild_player.clear()
     guild_player.get_voice_client().stop()
     await utils.MessageUtil.reply_fancy_message(f":white_check_mark: 成功清除 {str(length)} 首歌曲", discord.Colour.green(), message)
