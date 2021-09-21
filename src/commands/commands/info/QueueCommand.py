@@ -24,7 +24,9 @@ async def on_command(message: Message) -> None:
         await wdutils.MessageUtil.reply_fancy_message("目前並沒有任何待播歌曲", discord.Colour.red(), message)
         return
     msg: str = "> **歌曲清單**\n```"
+    index: int = 0
     for track in bot.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild)).tracks:
-        msg += track.name + "   (由 " + track.author + " 製作)\n"
+        msg += str(index) + ". " + track.name + "   (由 " + track.author + " 製作)\n"
+        index += 1
     msg += "```"
     await message.reply(msg, mention_author=False)

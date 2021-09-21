@@ -121,11 +121,14 @@ class GuildPlayer:
         self.tracks = new_tracks
         return None
 
-    def __remove(self, index: int) -> Union[Track, None]:
+    def remove(self, index: int) -> Union[Track, None]:
         try:
             track = self.tracks[index]
             if index == 0:
+                tmp = self.repeat_queue
+                self.repeat_queue = False
                 self.skip()
+                self.repeat_queue = tmp
                 return track
             self.pop(index)
             return track
@@ -182,6 +185,8 @@ class GuildPlayer:
         if self.get_voice_client().is_playing():
             self.skipped = True
             self.get_voice_client().stop()
+            self.skipped = False
+
 
         next_track: Union[Track, None] = self.next()
         if next_track is None:
