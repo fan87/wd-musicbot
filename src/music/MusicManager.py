@@ -202,7 +202,7 @@ class GuildPlayer:
 
 
 
-    def skip(self) -> bool:
+    def skip(self, amount: int = 1) -> bool:
         if self.get_voice_client() is None:
             self.clear()
             return False
@@ -210,9 +210,9 @@ class GuildPlayer:
             self.skipped = True
             self.get_voice_client().stop()
             self.skipped = False
-
-
-        next_track: Union[Track, None] = self.next()
+        next_track: Union[Track, None] = None
+        for i in range(amount):
+            next_track = self.next()
         if next_track is None:
             return False
         else:
