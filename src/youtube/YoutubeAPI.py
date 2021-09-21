@@ -4,6 +4,8 @@ import json
 
 import typing
 
+import requests
+
 API_KEY: str = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
 
 class Search:
@@ -87,6 +89,31 @@ async def search(query: str) -> Search:
     return Search(token, videos)
 
 
+def sync_get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
+    body: dict = {
+        "context": {
+            "client": {
+                "clientName": "ANDROID",
+                "clientVersion": "16.20"
+            }
+        },
+        "videoId": video_id
+    }
+    with requests.post(
+            f"https://youtubei.googleapis.com/youtubei/v1/player?key={API_KEY}&contentCheckOk=true&racyCheckOk=true",
+            json=body) as response:
+        json_body = response.json()
+        try:
+            for format in json_body["streamingData"]["adaptiveFormats"]:
+                try:
+                    if int(format["itag"]) == itag:
+                        return format["url"]
+                except:
+                    pass
+        except:
+            return pytube.YouTube("https://www.youtube.com/watch?v=" + video_id).streams.get_by_itag(itag).url
+    return None
+
 async def get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
     body: dict = {
         "context": {
@@ -110,3 +137,41 @@ async def get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
             except:
                 return pytube.YouTube("https://www.youtube.com/watch?v=" + video_id).streams.get_by_itag(itag).url
     return None
+
+
+async def get_video_details(video_id: str) -> typing.Optional[dict]:
+    body: dict = {
+        "context": {
+            "client": {
+                "clientName": "ANDROID",
+                "clientVersion": "16.20"
+            }
+        },
+        "videoId": video_id
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"https://youtubei.googleapis.com/youtubei/v1/player?key={API_KEY}&contentCheckOk=true&racyCheckOk=true", json=body) as response:
+            json_body = await response.json()
+            try:
+                return json_body["videoDetails"]
+            except:
+                pass
+    return None
+
+def sync_get_video_details(video_id: str) -> typing.Optional[dict]:
+    body: dict = {
+        "context": {
+            "client": {
+                "clientName": "ANDROID",
+                "clientVersion": "16.20"
+            }
+        },
+        "videoId": video_id
+    }
+    json_body = requests.post(
+        f"https://youtubei.googleapis.com/youtubei/v1/player?key={API_KEY}&contentCheckOk=true&racyCheckOk=true",
+        json=body).json()
+    try:
+        return json_body["videoDetails"]
+    except:
+        return None

@@ -1,6 +1,7 @@
 import asyncio
 import typing
 
+import InstanceManager
 import wdutils.MessageUtil
 from Bot import WDMusicBot
 import discord
@@ -16,7 +17,7 @@ class QueueCommand(WDCommand):
         super().__init__(commandsManager, "queue", ["q"], "資訊類")
 
 
-@main_command("顯示所有以被排序的歌曲清單", QueueCommand)
+
 async def on_command(message: Message) -> None:
     import InstanceManager
     bot: WDMusicBot = InstanceManager.mainInstance
@@ -30,3 +31,27 @@ async def on_command(message: Message) -> None:
         index += 1
     msg += "```"
     await message.reply(msg, mention_author=False)
+
+
+@main_command("顯示所有以被排序的歌曲清單", QueueCommand, page="頁數")
+async def playlist_contents(message: Message, page: int = 1) -> None:
+    guild_player = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
+    embed: discord.Embed = discord.Embed()
+    if int(len(guild_player.tracks) / 5.0) + 1 < page:
+        page = int(len(guild_player.tracks) / 5.0) + 1
+    embed.title = "待播清單的內容 (頁數: " + str(page) + "/" + str(int(len(guild_player.tracks) / 5.0) + 1) + ")"
+    i: int = 5 * (page - 1)
+    start: bool = False
+    ii: int = i
+    for track in guild_player.tracks[i:i + 5]:
+        if not start:
+            embed.description = "```\n"
+            start = True
+        ii += 1
+        embed.description += str(ii - 1) + ". " + track.name + "   (由 " + track.author + " 製作)\n"
+    if start:
+        embed.description += "```"
+    if len(guild_player.tracks) == 0:
+        embed.description = f"看似目前還沒有任何影片! 使用{InstanceManager.mainInstance.commandsManager.get_prefix(message.guild)}play 看看吧!"
+    embed.colour = discord.Colour.blue()
+    await message.reply(f"> {embed.title}\n{embed.description}", mention_author=False)

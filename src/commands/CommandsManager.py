@@ -1,5 +1,6 @@
 import asyncio
 import functools
+import threading
 from asyncio import AbstractEventLoop
 from typing import TYPE_CHECKING, Any, Callable
 import typing
@@ -35,7 +36,7 @@ class CommandsManager:
             return self.prefix
         else:
             return self.bot.data.get_guild(guild).prefix
-        
+
     def init(self) -> None:
         from commands.Command import WDCommand
         from Bot import WDMusicBot
@@ -66,7 +67,8 @@ class CommandsManager:
         content: str = message.content
         bot_user: User = self.bot.user
         if bot_user in message.mentions:
-            await message.reply("哈囉! 我的指令前綴是 " + self.get_prefix(message.guild) + "  請使用 " + self.get_prefix(message.guild) + "help 來查看指令清單")
+            await message.reply("哈囉! 我的指令前綴是 " + self.get_prefix(message.guild) + "  請使用 " + self.get_prefix(
+                message.guild) + "help 來查看指令清單")
             return
         if not content.startswith(self.get_prefix(message.guild)):
             channel: TextChannel = message.channel
@@ -78,7 +80,6 @@ class CommandsManager:
         if command is None:
             return
 
-        
         await self.invoke(command, message)
 
     async def invoke(self, command: 'WDCommand', message: Message) -> None:
@@ -87,7 +88,7 @@ class CommandsManager:
         for arg in old_arguments:
             if arg != "":
                 arguments.append(arg)
-        
+
         parameters: list = [message]
         func = self.commands[command]["main"]
         count: int = -2
@@ -112,7 +113,7 @@ class CommandsManager:
                     parameters.append(self.convert(message, arguments[count], type))
                 except:
                     parameters.append(arguments[count])
-                
+
             if para.kind == para.KEYWORD_ONLY:
                 starstar = para.name
                 try:
@@ -138,11 +139,9 @@ class CommandsManager:
                 break
 
         if starstar != "":
-            loop: AbstractEventLoop = asyncio.get_event_loop()
-            loop.create_task(func(*parameters, **{starstar: starstarpara}))
+            await func(*parameters, **{starstar: starstarpara})
         else:
-            loop = asyncio.get_event_loop()
-            loop.create_task(func(*parameters))
+            await func(*parameters)
 
 
     def convert(self, message: Message, stringIn: str, typeIn: str) -> Any:
@@ -178,7 +177,6 @@ class CommandsManager:
 
         return None
 
-
     def find_command(self, command_name: str) -> typing.Union['WDCommand', None]:
         from commands.Command import WDCommand
         for command in self.commands.keys():
@@ -197,7 +195,7 @@ def main_command(description: str, head_command: Any, **kwargs: Any) -> Callable
 
     if issubclass(WDCommand, head_command):
         raise TypeError("Head Command must extends WDCommand")
-    
+
     def inner(func: Any) -> Any:
         import InstanceManager
         if not inspect.isfunction(func):
@@ -205,10 +203,12 @@ def main_command(description: str, head_command: Any, **kwargs: Any) -> Callable
         found: bool = False
         for instance in InstanceManager.mainInstance.commandsManager.commands.keys():
             if type(instance) == head_command:
-                InstanceManager.mainInstance.commandsManager.commands[instance].update({"main": func, "main_description": description, "argument_info": kwargs})
+                InstanceManager.mainInstance.commandsManager.commands[instance].update(
+                    {"main": func, "main_description": description, "argument_info": kwargs})
                 found = True
         if not found:
-            raise LookupError("The Head Command is not registered. Please decorate with @register_command and define the class before the function. Also make sure the class is declared in the same file where you declared the function")
+            raise LookupError(
+                "The Head Command is not registered. Please decorate with @register_command and define the class before the function. Also make sure the class is declared in the same file where you declared the function")
         return func
 
     return inner

@@ -1,6 +1,8 @@
 import asyncio
+import concurrent
 import random
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from locale import Error
 from typing import Any, Optional, Union, cast
 import discord
@@ -19,6 +21,7 @@ from typing import TYPE_CHECKING
 import music.WDAudioSource
 import youtube.YoutubeAPI
 from events.EventManager import DiscordEventType
+from youtube import YoutubeAPI
 
 if TYPE_CHECKING:
     from Bot import WDMusicBot
@@ -142,10 +145,10 @@ class GuildPlayer:
     def get_voice_client(self) -> VoiceClient:
         return self.guild.voice_client
 
-    async def __play_song(self, video_id: str) -> None:
+    def __play_song(self, video_id: str) -> None:
         import InstanceManager
         try:
-            dir_url = await youtube.YoutubeAPI.get_dir_url(251, video_id)
+            dir_url = youtube.YoutubeAPI.sync_get_dir_url(251, video_id)
             self.get_voice_client().play(music.WDAudioSource.WDVolumeTransformer(
                 music.WDAudioSource.WDFFmpegPCMAudio(dir_url,
                                                      before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
@@ -157,8 +160,8 @@ class GuildPlayer:
         except Error as er:
             print(er)
 
-    async def play_track(self, track: Track) -> None:
-        await self.__play_song(track.video_id)
+    def play_track(self, track: Track) -> None:
+        self.__play_song(track.video_id)
 
     skipped: bool = False
 
@@ -172,11 +175,32 @@ class GuildPlayer:
     async def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:
             self.append(track)
-            await self.play_track(track)
+            self.play_track(track)
             return True
         else:
             self.append(track)
             return False
+
+    def fast_add_youtube_to_queue(self, youtube: YouTube) -> Track:
+
+        def inner() -> Track:
+            details = YoutubeAPI.sync_get_video_details(youtube.video_id)
+            return Track(name=details["title"], author="author", video_id=youtube.video_id, length=int(details["lengthSeconds"]))
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(inner)
+            track = future.result()
+            if self.get_current_track() is None:
+                self.append(track)
+                print("Added Song")
+                self.play_track(track)
+                return track
+            else:
+                print("Added Song")
+                self.append(track)
+                return track
+
+
 
     def skip(self) -> bool:
         if self.get_voice_client() is None:
@@ -193,14 +217,7 @@ class GuildPlayer:
             return False
         else:
 
-            def play_track() -> None:
-                loop = asyncio.new_event_loop()
-                future = loop.create_task(self.play_track(cast(Track, next_track)))
-                loop.run_until_complete(future)
-                loop.close()
-
-            thread: threading.Thread = threading.Thread(target=play_track)
-            thread.start()
+            self.play_track(cast(Track, next_track))
 
             return True
 
@@ -209,7 +226,21 @@ class GuildPlayer:
         return Track(yt.title, yt.author, str(yt.video_id), yt.length)
 
     async def get_track_from_youtube_pytube(self, yt: pytube.YouTube) -> Track:
-        return Track(yt.title, yt.author, str(yt.video_id), yt.length)
+        def get_title() -> str:
+            return yt.title
+        def get_author() -> str:
+            return yt.author
+        def get_length() -> int:
+            return yt.length
+        executor = ThreadPoolExecutor(max_workers=10)
+        results = await asyncio.gather(
+            asyncio.get_event_loop().run_in_executor(executor, get_title),
+            asyncio.get_event_loop().run_in_executor(executor, get_author),
+            asyncio.get_event_loop().run_in_executor(executor, get_length),
+        )
+        executor.shutdown()
+
+        return Track(results[0], results[1], str(yt.video_id), results[2])
 
 
 class MusicManager:
@@ -231,7 +262,7 @@ class MusicManager:
                     await channel.connect()
                     guild_player: GuildPlayer = self.get_guild_player(dcguild)
                     if len(guild_player.tracks) >= 1:
-                        await guild_player.play_track(cast(Track, guild_player.get_current_track()))
+                        guild_player.play_track(cast(Track, guild_player.get_current_track()))
                     else:
                         raise Error()
                 except Error as err:

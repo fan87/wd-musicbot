@@ -1,5 +1,6 @@
 import discord
 import pytube
+import typing
 from discord.message import Message
 
 import InstanceManager
@@ -77,23 +78,57 @@ class AddPlaylistCommand(WDCommand):
 
 @main_command("在播放清單新增歌曲", AddPlaylistCommand, name="播放清單名稱", song="搜尋文字 | 連結")
 async def add_playlist(message: Message, name: str, *, song: str) -> None:
-    guild_player: GuildPlayer = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
-    try:
-        yt: pytube.YouTube = pytube.YouTube(song)
-    except:
-        await wdutils.MessageUtil.reply_fancy_message(":mag: 搜尋中...", discord.Colour.gold(), message)
-        result: youtube.YoutubeAPI.Search = await youtube.YoutubeAPI.search(song)
 
-        if len(result.videos) <= 0:
-            await wdutils.MessageUtil.reply_fancy_message(":grimacing: 抱歉我沒找到音樂，請再次使用指令搜尋", discord.Colour.red(), message)
-            return
-        yt = result.videos[0]
+
 
     if InstanceManager.mainInstance.data.get_guild(message.guild).has_playlist(name):
-        track: Track = await guild_player.get_track_from_youtube_pytube(yt)
-        InstanceManager.mainInstance.data.get_guild(message.guild).get_playlist(name).tracks.append(track)
+        guild_player = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
+        guild_playlist = InstanceManager.mainInstance.data.get_guild(message.guild).get_playlist(name)
+        count: int = 0
+
+        try:
+            playlist: pytube.Playlist = pytube.Playlist(song)
+            playlist.videos
+            playlist.title
+
+            await wdutils.MessageUtil.reply_fancy_message("請稍後... 這可能須要一些時間。 ", discord.Colour.gold(), message)
+
+            vid: typing.Any = None
+            for video in playlist.videos:
+                count = count + 1
+                if count == 1:
+                    vid = await guild_player.get_track_from_youtube_pytube(video)
+
+                guild_playlist.tracks.append(await guild_player.get_track_from_youtube_pytube(video))
+                InstanceManager.mainInstance.configsManager.save_data()
+
+            embed = discord.Embed()
+            embed.title = playlist.title
+            embed.description = f":white_check_mark: 成功新增 {count} 部影片至播放清單"
+            embed.colour = discord.Colour.green()
+            embed.set_image(url=f"https://i.ytimg.com/vi/{vid.video_id}/hq720.jpg")
+            embed.url = f"https://www.youtube.com/watch?v={vid.video_id}"
+            await message.reply(embed=embed, mention_author=False)
+            return
+        except Exception as err:
+            print(err)
+            try:
+                yt: pytube.YouTube = pytube.YouTube(song)
+            except:
+                await wdutils.MessageUtil.reply_fancy_message(":mag: 搜尋中...", discord.Colour.gold(), message)
+                result: youtube.YoutubeAPI.Search = await youtube.YoutubeAPI.search(song)
+
+                if len(result.videos) <= 0:
+                    await wdutils.MessageUtil.reply_fancy_message(":grimacing: 抱歉我沒找到音樂，請再次使用指令搜尋",
+                                                                  discord.Colour.red(),
+                                                                  message)
+                    return
+                yt = result.videos[0]
+
+        track = await guild_player.get_track_from_youtube_pytube(yt)
+        guild_playlist.tracks.append(track)
         InstanceManager.mainInstance.configsManager.save_data()
-        embed: discord.Embed = discord.Embed()
+        embed = discord.Embed()
         embed.title = yt.title
         embed.set_author(name=yt.author)
         embed.description = ":white_check_mark: 成功新增 " + "https://youtube.com/watch?v=" + yt.video_id + " 至播放清單"
@@ -172,7 +207,7 @@ async def playlist_contents(message: Message, name: str, page: int = 1) -> None:
         i: int = 5*(page - 1)
         start: bool = False
         ii: int = i
-        for track in playlist.tracks[i:i+10]:
+        for track in playlist.tracks[i:i+5]:
             if not start:
                 embed.description = "```\n"
                 start = True
