@@ -3,13 +3,13 @@ import threading
 import typing
 
 import music.WDAudioSource
-import utils.MessageUtil
+import wdutils.MessageUtil
 from Bot import WDMusicBot
 import discord
 from discord.message import Message
 from commands.CommandsManager import CommandsManager, main_command, register_command
-from utils import MessageUtil, TimeParser
-from utils.override import override
+from wdutils import MessageUtil, TimeParser
+from wdutils.override import override
 from commands.Command import WDCommand
 
 

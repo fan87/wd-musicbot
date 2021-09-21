@@ -5,7 +5,7 @@ from Bot import WDMusicBot
 import discord
 from discord.message import Message
 from commands.CommandsManager import CommandsManager, main_command, register_command
-from utils.override import override
+from wdutils.override import override
 from commands.Command import WDCommand
 
 

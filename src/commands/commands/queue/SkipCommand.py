@@ -5,10 +5,10 @@ from discord import Message
 
 import InstanceManager
 import commands.Command
-import utils.MessageUtil
+import wdutils.MessageUtil
 from Bot import WDMusicBot
 from commands.CommandsManager import CommandsManager, register_command, main_command
-from utils import MessageUtil
+from wdutils import MessageUtil
 
 
 @register_command
@@ -31,4 +31,4 @@ async def on_command(message: Message, amount: int = 1) -> None:
         else:
             break
 
-    await utils.MessageUtil.reply_fancy_message(":white_check_mark: 成功跳過 " + str(count) + " 首歌曲", discord.Colour.green(), message)
+    await wdutils.MessageUtil.reply_fancy_message(":white_check_mark: 成功跳過 " + str(count) + " 首歌曲", discord.Colour.green(), message)

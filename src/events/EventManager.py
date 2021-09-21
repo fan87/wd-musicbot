@@ -3,7 +3,7 @@ from typing import Callable, Any
 
 import discord
 
-from utils.Function import Function
+from wdutils.Function import Function
 
 
 class DiscordEventType(Enum):

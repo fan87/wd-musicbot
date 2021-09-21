@@ -5,11 +5,11 @@ from discord import Message
 
 import InstanceManager
 import commands.Command
-import utils.MessageUtil
+import wdutils.MessageUtil
 from Bot import WDMusicBot
 from commands.CommandsManager import CommandsManager, register_command, main_command
 from music.MusicManager import GuildPlayer
-from utils import MessageUtil
+from wdutils import MessageUtil
 
 
 @register_command
@@ -30,4 +30,4 @@ async def on_command(message: Message, amount: int = 1) -> None:
     length: int = len(guild_player.tracks)
     guild_player.clear()
     guild_player.get_voice_client().stop()
-    await utils.MessageUtil.reply_fancy_message(f":white_check_mark: 成功清除 {str(length)} 首歌曲", discord.Colour.green(), message)
+    await wdutils.MessageUtil.reply_fancy_message(f":white_check_mark: 成功清除 {str(length)} 首歌曲", discord.Colour.green(), message)

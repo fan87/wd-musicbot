@@ -4,9 +4,9 @@ from asyncio.events import AbstractEventLoop
 import typing
 
 import InstanceManager
-import utils.MessageUtil
+import wdutils.MessageUtil
 from music.MusicManager import GuildPlayer
-from utils import MessageUtil, TimeParser
+from wdutils import MessageUtil, TimeParser
 import discord
 from discord.message import Message
 from commands.CommandsManager import CommandsManager, main_command, register_command
@@ -37,7 +37,7 @@ async def forward_main(message: Message, seconds: float) -> None:
 
     guild_player.get_audio_source().jump(min(max(int(guild_player.get_audio_source().time/1000) + int(seconds), 0),
                                              guild_player.get_current_track().length) * 1000)
-    await utils.MessageUtil.reply_fancy_message(":fast_forward: 成功快轉 " + seconds.__str__() + " 秒",
+    await wdutils.MessageUtil.reply_fancy_message(":fast_forward: 成功快轉 " + seconds.__str__() + " 秒",
                                                 discord.Colour.green(), message)
 
 
@@ -65,7 +65,7 @@ async def rewind_main(message: Message, seconds: float) -> None:
 
     guild_player.get_audio_source().jump(min(max(int(guild_player.get_audio_source().time/1000) - int(seconds), 0),
                                              guild_player.get_current_track().length) * 1000)
-    await utils.MessageUtil.reply_fancy_message(":rewind: 成功倒帶 " + seconds.__str__() + " 秒",
+    await wdutils.MessageUtil.reply_fancy_message(":rewind: 成功倒帶 " + seconds.__str__() + " 秒",
                                                 discord.Colour.green(), message)
 
 
@@ -92,5 +92,5 @@ async def seek_main(message: Message, seconds: float) -> None:
 
     guild_player.get_audio_source().jump(
         min(max(int(seconds), 0), guild_player.get_current_track().length) * 1000)
-    await utils.MessageUtil.reply_fancy_message(":arrow_right: 成功跳至 " + TimeParser.parse(int(seconds)) + "",
+    await wdutils.MessageUtil.reply_fancy_message(":arrow_right: 成功跳至 " + TimeParser.parse(int(seconds)) + "",
                                                 discord.Colour.green(), message)

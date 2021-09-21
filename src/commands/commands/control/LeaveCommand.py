@@ -4,7 +4,7 @@ from asyncio.events import AbstractEventLoop
 import typing
 
 import InstanceManager
-from utils import MessageUtil
+from wdutils import MessageUtil
 import discord
 from discord.message import Message
 from commands.CommandsManager import CommandsManager, main_command, register_command

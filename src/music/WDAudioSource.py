@@ -10,7 +10,7 @@ import typing
 from discord import ClientException
 from discord.opus import Encoder
 
-import utils.TimeParser
+import wdutils.TimeParser
 
 log: logging.Logger = logging.getLogger(__name__)
 
@@ -148,7 +148,7 @@ class WDFFmpegPCMAudio(WDFFmpegAudio):
             args.append(arg)
             if i == 1:
                 args.append("-ss")
-                args.append(utils.TimeParser.parse_milli(milli))
+                args.append(wdutils.TimeParser.parse_milli(milli))
         self.process = self.spawn_process(args, **self.kwargs)
         self.stdout = self.process.stdout
 
