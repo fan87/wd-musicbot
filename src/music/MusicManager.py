@@ -104,7 +104,7 @@ class GuildPlayer:
         old_track: Track = self.pop(0)
         if self.repeat_queue:
             self.append(old_track)
-
+        self.get_music_manager().bot.save_data()
         if len(self.tracks) >= 1:
             return self.tracks[0]
         else:
@@ -168,6 +168,7 @@ class GuildPlayer:
     def __after(self, error: Error) -> None:
         if not self.skipped:
             try:
+                self.skipped = False
                 self.skip()
             except:
                 pass
@@ -203,20 +204,21 @@ class GuildPlayer:
 
 
     def skip(self, amount: int = 1) -> bool:
+        self.skipped = True
         if self.get_voice_client() is None:
             self.clear()
             return False
         if self.get_voice_client().is_playing():
-            self.skipped = True
             self.get_voice_client().stop()
-            self.skipped = False
         next_track: Union[Track, None] = None
         for i in range(amount):
             next_track = self.next()
-        if next_track is None:
+        if self.get_current_track() is None:
+            self.skipped = False
             return False
         else:
             self.play_track(cast(Track, self.get_current_track()))
+            self.skipped = False
             return True
 
     async def get_track_from_youtube(self, youtube_url: str) -> Track:
@@ -264,6 +266,7 @@ class MusicManager:
                     else:
                         raise Error()
                 except Error as err:
+                    print(err)
                     guild.last_vc = 0
                     bot.configsManager.save_data()
 

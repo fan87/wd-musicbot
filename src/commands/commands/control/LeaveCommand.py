@@ -22,8 +22,6 @@ async def leave(message: Message) -> None:
         await MessageUtil.reply_fancy_message(":x: 機器人早已退出! 請使用 " + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild) + "join 讓機器人加入語音頻道", discord.Colour.red(), message)
         return
 
-    loop: AbstractEventLoop = asyncio.get_event_loop()
-    loop.create_task(message.author.voice.channel.connect())
     await message.guild.voice_client.disconnect()
     guild_player = InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild))
     guild_player.clear()

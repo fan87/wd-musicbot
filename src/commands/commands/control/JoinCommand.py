@@ -25,5 +25,6 @@ async def join(message: Message) -> None:
     InstanceManager.mainInstance.configsManager.save_data()
     loop: AbstractEventLoop = asyncio.get_event_loop()
     loop.create_task(message.author.voice.channel.connect())
+
     await MessageUtil.reply_fancy_message(":white_check_mark: 成功加入語音頻道", discord.Colour.green(), message)
     return
