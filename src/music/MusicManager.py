@@ -194,6 +194,7 @@ class MusicManager:
 
     async def ready(self) -> None:
         bot = self.bot
+        bot.ready = True
         for guild in bot.data.guilds:
             print(guild.guild_id)
             if guild.last_vc != 0:

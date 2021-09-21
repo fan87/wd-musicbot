@@ -50,7 +50,10 @@ class CommandsManager:
                     import_name = filepath.replace("/", ".")
                     module = __import__(import_name)
         bot: WDMusicBot = self.bot
-        bot.eventManager.add_listener(DiscordEventType.ON_MESSAGE, self.process_command)
+        bot.eventManager.add_listener(DiscordEventType.ON_READY, self.ready)
+
+    async def ready(self) -> None:
+        self.bot.eventManager.add_listener(DiscordEventType.ON_MESSAGE, self.process_command)
 
     async def process_command(self, message: Message) -> None:
         from commands.Command import WDCommand
@@ -59,8 +62,9 @@ class CommandsManager:
             return
         content: str = message.content
         bot_user: User = self.bot.user
-        if content == bot_user.mention:
+        if bot_user in message.mentions:
             await message.reply("哈囉! 我的指令前綴是 " + self.get_prefix(message.guild) + "  請使用 " + self.get_prefix(message.guild) + "help 來查看指令清單")
+            return
         if not content.startswith(self.get_prefix(message.guild)):
             channel: TextChannel = message.channel
             return

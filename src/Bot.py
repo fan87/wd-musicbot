@@ -18,6 +18,7 @@ class WDMusicBot(discord.Client):
     configsManager: ConfigsManager = None
     commandsManager: CommandsManager = None
     musicManager: MusicManager = None
+    ready: bool = False
 
     config: BotConfig = BotConfig()
     data: dataSaver.BotData.MainData = dataSaver.BotData.MainData()
