@@ -23,8 +23,14 @@ class BassCommand(WDCommand):
 
 @main_command("低音go brr", BassCommand, value="低音加成程度(0% - 200%, 預設100%)")
 async def bass_command(message: discord.Message, value: int) -> None:
-    guild_player: GuildPlayer = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
-    guild_player.bass = min(max((value * (40 / 200)) - 20, -20), 20)
-    await wdutils.MessageUtil.reply_fancy_message(":white_check_mark: 成功設置低音加成程度至 " + str((guild_player.bass+20)*5) + "%!",
-                                                  discord.Colour.green(),
-                                                  message)
+    if value is None:
+        guild_player: GuildPlayer = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
+        await wdutils.MessageUtil.reply_fancy_message(":white_check_mark: 低音加成程度: " + str((guild_player.bass+20)*5) + "%!",
+                                                      discord.Colour.green(),
+                                                      message)
+    else:
+        guild_player = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
+        guild_player.bass = min(max((value * (40 / 200)) - 20, -20), 20)
+        await wdutils.MessageUtil.reply_fancy_message(":white_check_mark: 成功設置低音加成程度至 " + str((guild_player.bass+20)*5) + "%!",
+                                                      discord.Colour.green(),
+                                                      message)
