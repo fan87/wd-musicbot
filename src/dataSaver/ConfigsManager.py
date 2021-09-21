@@ -41,5 +41,4 @@ class ConfigsManager:
 
     def save_data(self) -> 'MainData':
         open("run/data.json", "w").write(json.dumps(json.loads(Pykson().to_json(self.bot.data)), indent=4, sort_keys=True))
-        print(json.dumps(json.loads(Pykson().to_json(self.bot.data)), indent=4, sort_keys=True))
         return self.bot.data
