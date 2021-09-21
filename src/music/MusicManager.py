@@ -125,14 +125,17 @@ class GuildPlayer:
 
     async def __play_song(self, video_id: str) -> None:
         import InstanceManager
-        dir_url = await youtube.YoutubeAPI.get_dir_url(251, video_id)
-        self.get_voice_client().play(music.WDAudioSource.WDVolumeTransformer(
-            music.WDAudioSource.WDFFmpegPCMAudio(dir_url,
-                                                 before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-                                                 options='-vn'
-                                                 ),
-            volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
-            after=self.__after)
+        try:
+            dir_url = await youtube.YoutubeAPI.get_dir_url(251, video_id)
+            self.get_voice_client().play(music.WDAudioSource.WDVolumeTransformer(
+                music.WDAudioSource.WDFFmpegPCMAudio(dir_url,
+                                                     before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+                                                     options='-vn'
+                                                     ),
+                volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
+                after=self.__after)
+        except Error as er:
+            print(er)
 
     async def play_track(self, track: Track) -> None:
         await self.__play_song(track.video_id)
@@ -141,7 +144,10 @@ class GuildPlayer:
 
     def __after(self, error: Error) -> None:
         if not self.skipped:
-            self.skip()
+            try:
+                self.skip()
+            except:
+                pass
 
     async def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:

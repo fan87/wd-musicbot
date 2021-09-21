@@ -58,6 +58,6 @@ async def on_command(message: Message) -> None:
                 wdutils.MessageUtil.get_fancy_embed(":ping_pong: 目前語音延遲: 未知。請晚點再回來看看",
                                                           discord.Colour.green()))
 
-    for embed in embeds:
-        await message.reply(embed=embed, mention_author=False)
+    await message.reply(embed=embeds[0], mention_author=False)
+    await message.channel.send(embed=embeds[1])
 

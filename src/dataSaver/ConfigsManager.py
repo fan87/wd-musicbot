@@ -5,16 +5,20 @@ from typing import IO
 from dataSaver.BotConfig import BotConfig
 import os
 from pykson import Pykson
-from dataSaver.BotData import MainData
 
 if typing.TYPE_CHECKING:
     from Bot import WDMusicBot
+    from dataSaver.BotData import MainData
+
+
 
 class ConfigsManager:
 
     bot: 'WDMusicBot' = None
 
     def __init__(self, bot: 'WDMusicBot') -> None:
+        from dataSaver.BotData import MainData
+
         self.bot = bot
         try:
             os.mkdir("run/")

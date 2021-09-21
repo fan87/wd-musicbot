@@ -15,10 +15,10 @@ from wdutils import MessageUtil
 @register_command
 class SkipCommand(commands.Command.WDCommand):
     def __init__(self, commandsManager: CommandsManager) -> None:
-        super().__init__(commandsManager, "skip", ["next"], "待播清單控制類")
+        super().__init__(commandsManager, "clear", ["delall"], "待播清單控制類")
 
-@main_command("跳過歌曲", SkipCommand, amount="歌曲數量")
-async def on_command(message: Message, amount: int = 1) -> None:
+@main_command("清除待播歌單", SkipCommand)
+async def on_command(message: Message) -> None:
     guild_player: GuildPlayer = InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild))
     if guild_player.get_voice_client() is None:
         await MessageUtil.reply_fancy_message(":x: 機器人尚未加入語音頻道! 請使用 " + InstanceManager.mainInstance.commandsManager.get_prefix(message.guild) + "join 讓機器人加入語音頻道", discord.Colour.red(), message)

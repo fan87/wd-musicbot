@@ -31,7 +31,10 @@ class CommandsManager:
         self.prefix = prefix
 
     def get_prefix(self, guild: typing.Union[discord.Guild, Any]) -> str:
-        return self.prefix
+        if self.bot.data.get_guild(guild).prefix == "__ DEFAULT __":
+            return self.prefix
+        else:
+            return self.bot.data.get_guild(guild).prefix
         
     def init(self) -> None:
         from commands.Command import WDCommand

@@ -1,15 +1,15 @@
+import typing
+
 from discord.flags import Intents
 
-import dataSaver.BotData
 from music.MusicManager import MusicManager
 from commands.CommandsManager import CommandsManager
 from dataSaver.ConfigsManager import ConfigsManager
 from events.EventManager import DiscordEventManager, DiscordEventType
 
 import discord
-
 from dataSaver.BotConfig import BotConfig
-
+from dataSaver.BotData import MainData
 
 
 class WDMusicBot(discord.Client):
@@ -21,10 +21,13 @@ class WDMusicBot(discord.Client):
     ready: bool = False
 
     config: BotConfig = BotConfig()
-    data: dataSaver.BotData.MainData = dataSaver.BotData.MainData()
+    data: MainData = MainData()
+
+    def save_data(self) -> None:
+        self.configsManager.save_data()
 
     def __init__(self) -> None:
-        
+
         super().__init__(intents=Intents.all())
         
         import InstanceManager
@@ -37,10 +40,10 @@ class WDMusicBot(discord.Client):
 
         self.commandsManager.init()
 
-        
+
         print("機器人成功啟動，正在連線至Discord...")
         self.register_listeners()
-        
+
 
     def register_listeners(self) -> None:
         self.eventManager.add_listener(DiscordEventType.ON_CONNECT, self.ready_handling)
