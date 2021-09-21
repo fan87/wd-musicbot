@@ -15,11 +15,11 @@ class VolumeCommand(WDCommand):
     def __init__(self, commandsManager: CommandsManager) -> None:
         super().__init__(commandsManager, "volume", ["v", "loud", "vol"], category="控制類")
 
-@main_command(description="更改音量大小", head_command=VolumeCommand, volume="音量(1-200)")
+@main_command(description="更改音量大小", head_command=VolumeCommand, volume="音量(0-400)")
 async def join(message: Message, volume: int) -> None:
 
     guild_player = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
-    vol: int = min(max(0, volume), 200)
+    vol: int = min(max(0, volume), 400)
     try:
         transformer: discord.PCMVolumeTransformer = guild_player.get_voice_client().source
         transformer.volume = float(vol/100.0)

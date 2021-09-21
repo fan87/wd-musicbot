@@ -15,7 +15,7 @@ from pytube.streams import Stream
 
 from typing import TYPE_CHECKING
 
-import music.WDVolumeTransformer
+import music.WDAudioSource
 import youtube.YoutubeAPI
 
 if TYPE_CHECKING:
@@ -41,6 +41,9 @@ class GuildPlayer:
     repeat_queue: bool = False
 
     _music_manager = None
+
+    def get_audio_source(self) -> music.WDAudioSource.WDVolumeTransformer:
+        return self.get_voice_client().source
 
     def get_music_manager(self) -> 'MusicManager':
         return cast('MusicManager', self._music_manager)
@@ -99,11 +102,12 @@ class GuildPlayer:
     async def __play_song(self, video_id: str) -> None:
         import InstanceManager
         dir_url = await youtube.YoutubeAPI.get_dir_url(251, video_id)
-        self.get_voice_client().play(music.WDVolumeTransformer.WDVolumeTransformer(
-            discord.FFmpegPCMAudio(dir_url,
-                                   before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-                                   options='-vn'
-                                   ), volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
+        self.get_voice_client().play(music.WDAudioSource.WDVolumeTransformer(
+            music.WDAudioSource.WDFFmpegPCMAudio(dir_url,
+                                                 before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+                                                 options='-vn'
+                                                 ),
+            volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
             after=self.__after)
 
     async def __play_track(self, track: Track) -> None:
@@ -114,16 +118,7 @@ class GuildPlayer:
     def __after(self, error: Error) -> None:
         if not self.skipped:
             self.skip()
-        # if not self.skipped:
-        #     self.skipped = False
-        #     next_track: Union[Track, None] = self.next()
-        #     print(next_track)
-        #     if next_track is not None:
-        #         loop = asyncio.get_event_loop()
-        #         loop.create_task(self.__play_track(next_track))
-        #     else:
-        #         if len(self.tracks) == 1:
-        #             self.tracks.pop(0)
+
 
     async def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:
@@ -135,6 +130,8 @@ class GuildPlayer:
             return False
 
     def skip(self) -> bool:
+        if self.get_voice_client() is None:
+            self.tracks.clear()
         if self.get_voice_client().is_playing():
             self.skipped = True
             self.get_voice_client().stop()
@@ -143,7 +140,6 @@ class GuildPlayer:
         if next_track is None:
             return False
         else:
-            print(next_track.name)
 
             def play_track() -> None:
                 loop = asyncio.new_event_loop()
