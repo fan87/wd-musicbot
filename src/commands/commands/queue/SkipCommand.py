@@ -26,9 +26,6 @@ async def on_command(message: Message, amount: int = 1) -> None:
         return
     count: int = 0
     for i in range(amount):
-        if InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild)).skip():
-            count += 1
-        else:
-            break
+        InstanceManager.mainInstance.musicManager.get_guild_player(typing.cast(discord.Guild, message.guild)).skip(amount)
 
-    await wdutils.MessageUtil.reply_fancy_message(":white_check_mark: 成功跳過 " + str(count) + " 首歌曲", discord.Colour.green(), message)
+    await wdutils.MessageUtil.reply_fancy_message(":white_check_mark: 成功跳過 " + str(amount) + " 首歌曲", discord.Colour.green(), message)
