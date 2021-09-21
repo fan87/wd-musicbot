@@ -6,3 +6,4 @@ pytube~=11.0.1
 PyNaCl~=1.4.0
 youtube-dl~=2021.6.6
 aiohttp~=3.7.4
+requests
