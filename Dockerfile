@@ -5,7 +5,9 @@ RUN DEBIAN_FRONTEND="noninteractive" apt install python3.9 -y
 RUN DEBIAN_FRONTEND="noninteractive" apt install python3-pip -y
 RUN DEBIAN_FRONTEND="noninteractive" apt install ffmpeg -y
 COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
+RUN python3.9 -m pip install -r /tmp/requirements.txt
 COPY . /WDMusicBot/
-RUN rm -r /WDMusicBot/run
-ENTRYPOINT ["/bin/bash", "WDMusicBot/run.sh"]
+RUN DEBIAN_FRONTEND="noninteractive" apt install git -y
+RUN git init
+RUN git remote add origin https://github.com/fan87/wd-musicbot
+ENTRYPOINT ["/bin/bash", "WDMusicBot/debug.sh"]
