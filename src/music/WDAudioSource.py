@@ -137,7 +137,7 @@ class WDFFmpegPCMAudio(WDFFmpegAudio):
 
         args.append('-i')
         args.append('-' if pipe else source)
-        args.extend(('-f', 's16le', '-ar', '48000', '-ac', '2'))
+        args.extend(('-f', 's16le', '-ar', '48000', '-ac', '2', '-loglevel', 'quiet'))
 
         if isinstance(options, str):
             args.extend(shlex.split(options))
