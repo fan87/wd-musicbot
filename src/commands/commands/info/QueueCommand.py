@@ -38,7 +38,7 @@ async def playlist_contents(message: Message, page: int = 1) -> None:
     guild_player = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
     embed: discord.Embed = discord.Embed()
     pc = int(len(guild_player.tracks) / 5.0)
-    if len(guild_player.tracks) / 5.0 != pc:
+    if len(guild_player.tracks) % 5.0 != 0:
         pc += 1
     if pc < page:
         page = pc

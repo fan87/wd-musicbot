@@ -201,9 +201,12 @@ async def playlist_contents(message: Message, name: str, page: int = 1) -> None:
     if InstanceManager.mainInstance.data.get_guild(message.guild).has_playlist(name):
         playlist = InstanceManager.mainInstance.data.get_guild(message.guild).get_playlist(name)
         embed: discord.Embed = discord.Embed()
-        if int(len(playlist.tracks)/5.0) + 1 < page:
-            page = int(len(playlist.tracks)/5.0) + 1
-        embed.title = "`" + name + "` 的內容 (頁數: " + str(page) + "/" + str(int(len(playlist.tracks)/5.0) + 1) + ")"
+        pc = int(len(playlist.tracks)/5.0)
+        if len(playlist.tracks) % 5.0 != 0:
+            pc += 1
+        if pc < page:
+            page = pc
+        embed.title = "`" + name + "` 的內容 (頁數: " + str(page) + "/" + str(pc) + ")"
         i: int = 5*(page - 1)
         start: bool = False
         ii: int = i
