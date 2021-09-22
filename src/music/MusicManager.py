@@ -155,7 +155,7 @@ class GuildPlayer:
             dir_url = youtube.YoutubeAPI.sync_get_dir_url(251, video_id)
             self.get_voice_client().play(music.WDAudioSource.WDVolumeTransformer(
                 music.WDAudioSource.WDFFmpegPCMAudio(dir_url,
-                                                     before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+                                                     before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -err_detect ignore_err',
                                                      options='-vn'
                                                      ),
                 volume=self.get_music_manager().bot.data.get_guild(self.guild).volume),
@@ -171,7 +171,6 @@ class GuildPlayer:
 
     def __after(self, error: Error) -> None:
         if not self.skipped:
-            print("Not good")
             try:
                 self.skipped = False
                 self.skip()
@@ -215,11 +214,9 @@ class GuildPlayer:
             track = future.result()
             if self.get_current_track() is None:
                 self.append(track)
-                print("Added Song")
                 self.play_track(track)
                 return track
             else:
-                print("Added Song")
                 self.append(track)
                 return track
 
