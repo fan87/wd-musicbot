@@ -74,7 +74,7 @@ class CommandsManager:
             channel: TextChannel = message.channel
             return
         command_name: str = content.split(" ")[0]
-        command_name = command_name[int(1):int(len(command_name))]
+        command_name = command_name[int(len(self.get_prefix(message.guild))):int(len(command_name))]
         command: WDCommand = self.find_command(command_name)
 
         if command is None:

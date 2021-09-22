@@ -11,4 +11,5 @@ RUN rm -r /WDMusicBot/run
 RUN DEBIAN_FRONTEND="noninteractive" apt install git -y
 RUN git init
 RUN git remote add origin https://github.com/fan87/wd-musicbot
+EXPOSE 80
 ENTRYPOINT ["/bin/bash", "WDMusicBot/run.sh"]
