@@ -138,6 +138,7 @@ class CommandsManager:
                     starstarpara = argument.split("=")[0]
                 break
 
+
         if starstar != "":
             await func(*parameters, **{starstar: starstarpara})
         else:
