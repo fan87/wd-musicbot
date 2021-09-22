@@ -91,6 +91,10 @@ class GuildPlayer:
         self.tracks.append(track)
         self.get_music_manager().bot.configsManager.save_data()
 
+    def insert(self, track: Track, index: int) -> None:
+        self.tracks.insert(index, track)
+        self.get_music_manager().bot.configsManager.save_data()
+
     def pop(self, index: int) -> Track:
         track = self.tracks.pop(index)
         self.get_music_manager().bot.configsManager.save_data()
@@ -167,6 +171,7 @@ class GuildPlayer:
 
     def __after(self, error: Error) -> None:
         if not self.skipped:
+            print("Not good")
             try:
                 self.skipped = False
                 self.skip()
@@ -180,6 +185,23 @@ class GuildPlayer:
             return True
         else:
             self.append(track)
+            return False
+
+    async def insert_to_queue(self, track: Track, index: int) -> bool:
+
+        if index == 0:
+            if (self.get_voice_client() is not None) and (self.get_voice_client().is_playing()):
+                self.skipped = True
+                self.get_voice_client().stop()
+            self.insert(track, index)
+            self.play_track(cast(Track, self.get_current_track()))
+            return True
+        if self.get_current_track() is None:
+            self.insert(track, index)
+            self.play_track(cast(Track, self.get_current_track()))
+            return True
+        else:
+            self.insert(track, index)
             return False
 
     def fast_add_youtube_to_queue(self, youtube: YouTube) -> Track:
@@ -214,11 +236,9 @@ class GuildPlayer:
         for i in range(amount):
             next_track = self.next()
         if self.get_current_track() is None:
-            self.skipped = False
             return False
         else:
             self.play_track(cast(Track, self.get_current_track()))
-            self.skipped = False
             return True
 
     async def get_track_from_youtube(self, youtube_url: str) -> Track:

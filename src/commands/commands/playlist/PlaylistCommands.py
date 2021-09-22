@@ -73,7 +73,7 @@ async def remove_playlist(message: Message, name: str) -> None:
 @register_command
 class AddPlaylistCommand(WDCommand):
     def __init__(self, commandsManager: CommandsManager) -> None:
-        super().__init__(commandsManager, "playlist-add", ["add", "pladd"], "播放清單控制")
+        super().__init__(commandsManager, "playlist-add", ["pladd"], "播放清單控制")
 
 
 @main_command("在播放清單新增歌曲", AddPlaylistCommand, name="播放清單名稱", song="搜尋文字 | 連結")
