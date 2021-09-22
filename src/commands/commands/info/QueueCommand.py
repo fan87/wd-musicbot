@@ -37,9 +37,12 @@ async def on_command(message: Message) -> None:
 async def playlist_contents(message: Message, page: int = 1) -> None:
     guild_player = InstanceManager.mainInstance.musicManager.get_guild_player_by_message(message)
     embed: discord.Embed = discord.Embed()
-    if int(len(guild_player.tracks) / 5.0) + 1 < page:
-        page = int(len(guild_player.tracks) / 5.0) + 1
-    embed.title = "待播清單的內容 (頁數: " + str(page) + "/" + str(int(len(guild_player.tracks) / 5.0) + 1) + ")"
+    pc = int(len(guild_player.tracks) / 5.0)
+    if len(guild_player.tracks) / 5.0 != pc:
+        pc += 1
+    if pc < page:
+        page = pc
+    embed.title = "待播清單的內容 (頁數: " + str(page) + "/" + str(pc) + ")"
     i: int = 5 * (page - 1)
     start: bool = False
     ii: int = i
