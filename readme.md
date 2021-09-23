@@ -11,6 +11,32 @@
 <br>
 <br>
 
+## 安裝教學: 直接執行
+如果您的伺服器正在使用Ubuntu，或者您確定您所使用的作業系統支援Ubuntu Docker Image(這可能包括您電腦支援WSL 2)，請改用 安裝教學: Docker<br>
+本安裝方式極不推薦，但是這邊還是公開一下，畢竟還有人的Windows跑不了Docker
+
+### 第一步: 下載
+ 您必須安裝Git，Git的下載能在 [本連結](https://git-scm.com/) 找到<br>
+ 安裝完成後，您就可以使用以下指令
+```shell
+git clone https://github.com/fan87/wd-musicbot.git
+```
+### 第二步: 更新/安裝 Python
+要執行此機器人，***您必須安裝Python 3.9***<br>
+若您正在使用Ubuntu，可直接使用以下指令:
+```shell
+sudo apt install -y python3.9
+```
+若您正在使用Windows，您可能會需要到Python官方網站下載最新版本的Python，並且將舊版Python的路徑從PATH移除。也因為這些複雜的安裝方式，Docker極為推薦
+### 第三步: 執行
+```shell
+cd wd-musicbot
+python src/Bot.py
+```
+### 第四步: 設置
+類似於 安裝教學: Docker 設置
+
+
 ## 安裝教學: Docker
 使用Docker安裝是最安全且最快速的方法，前提是你有一個好網路。<br>
 若想了解關於Docker的詳情，請自行搜尋 <br>
@@ -126,8 +152,79 @@ git clone https://github.com/fan87/wd-musicbot && cd wd-musicbot
 
 <br>
 <br>
-<br>
-<br>
-<br>
 
-# README 仍在製作中
+## 如何開發
+這邊推薦使用Visual Studio Code，或者您擁有PyCharms Professional(可透過購買/GitHub學生帳號取得)可以使用PyCharms<br>
+這邊不使用 PyCharms Community 是因為本Repository包含TypeScript, HTML, CSS，而PyCharms Community(也就是免費版)並不支援TypeScript, 和CSS。<br>
+同時Visual Studio Code在設定正確的情況下能夠比PyCharms還要有更好的自動完成及效能優化。
+這裡給一套推薦Pylance(微軟所開發的Python自動完成系統)的設定:
+```json
+{
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.memory.keepLibraryAst": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnknownArgumentType": "none",
+        "reportUnknownLambdaType": "none",
+        "reportUnknownMemberType": "none",
+        "reportUnknownParameterType": "none",
+        "reportUnknownVariableType": "none",
+        "reportMissingTypeStubs": "none",
+        "reportUnusedVariable": "none",
+        "reportUnusedFunction": "none",
+        "reportUnusedImport": "none",
+        "reportUnnecessaryComparison": "none",
+        "reportUntypedBaseClass": "none",
+        "reportUntypedFunctionDecorator": "none",
+        "reportUntypedClassDecorator": "none",
+        "reportOptionalMemberAccess": "none",
+        "reportImportCycles": "warning"
+    },
+}
+```
+使用這套設定會剛好滿足本Repository的Code Style<br>
+> ***但這套設定並不適用於所有人。請自行設計出屬於自己的設定***
+
+
+好，回歸正題，如何開始開發?
+
+(既然您會想要開發，我就是以你了解許多相關知識的情況描述，例如: 我不會說怎麼取得Discord機器人Token，或者你將會需要Git之類的廢話)
+### 第一步: Clone
+若要協助開發，請先Fork。<br>
+若要用於私人版，可以使用下列方式:
+```sh
+git clone https://github.com/fan87/wd-musicbot
+```
+若您在GitHub有自己的Fork，請將https://github.com/fan87/wd-musicbot取代成該Repository的連結
+
+### 第二步: 安裝Python 3.9
+非常重要。如果您是使用Ubuntu:
+```sh
+sudo apt install python3.9
+```
+如果您是使用Windows，您需要從官方網站安裝Python3.9<br>
+如果您電腦已經有舊版Python，您可能會需要將舊版的Python路徑從path移除<br>
+或者，您可以使用Python Virtual Environment
+
+### 第三步: 開始開發
+這邊使用VS Code介紹<br>
+首先先打開VS Code:
+```sh
+cd wd-musicbot
+code . # 這行將會直接開啟VS Code
+```
+接下來，必須安裝所有的Dependencies:
+```sh
+python3.9 -m pip install requirements.txt # 如果您是使用Windows，請改為pip install requirements.txt，或者python -m pip install requirements.txt
+```
+又會者您是使用Virtual Environment(VENV)，請將python3.9改成venv/bin/python3.9或者其他python 3.9的路徑
+### 第四步: 執行
+如果您使用VS Code，在左邊Run and Debug能直接執行。<br>
+如果您是使用PyCharms，請在Run Configuration裡面的Interpreter Options增加`-B`<br>
+`-B`的用途是不要輸出__pycache__(如果git add . 會新增這些檔案至Git，這可能不是你想要的，同時: 這些資料夾有時看起來很煩)<br>
+
+## 授權
+本專案正在使用[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)<br>
+詳情請查看LICENSE檔案
+
+
+![](https://cdn.discordapp.com/attachments/869133787085287464/890594956203413545/unknown.png)
