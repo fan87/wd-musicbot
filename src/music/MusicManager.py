@@ -242,7 +242,7 @@ class GuildPlayer:
 
     async def get_track_from_youtube(self, youtube_url: str) -> Track:
         yt: YouTube = YouTube(youtube_url)
-        return Track(yt.title, yt.author, str(yt.video_id), yt.length)
+        return Track(yt.title, yt.author, str(yt.video_id), yt.length, yt.thumbnail_url)
 
     async def get_track_from_youtube_pytube(self, yt: pytube.YouTube) -> Track:
         def get_title() -> str:
