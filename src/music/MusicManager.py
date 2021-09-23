@@ -172,12 +172,21 @@ class GuildPlayer:
     skipped: bool = False
 
     def __after(self, error: Error) -> None:
+        
         if not self.skipped:
-            try:
-                self.skipped = False
-                self.skip()
-            except:
-                pass
+            if self.get_voice_client() is None:
+                self.clear()
+                return
+            if self.get_voice_client().is_playing():
+                self.get_voice_client().stop()
+            self.next()
+            if self.get_current_track() is None:
+                return
+            else:
+                self.play_track(cast(Track, self.get_current_track()))
+                return
+        else:
+            self.skipped = not self.skipped
 
     async def add_to_queue(self, track: Track) -> bool:
         if self.get_current_track() is None:
