@@ -159,7 +159,11 @@ class WDFFmpegPCMAudio(WDFFmpegAudio):
 
 
     def read(self) -> bytes:
-        ret = typing.cast(typing.IO, self.stdout).read(Encoder.FRAME_SIZE)
+        try:
+            ret = typing.cast(typing.IO, self.stdout).read(Encoder.FRAME_SIZE)
+        except:
+            return b''
+
         if len(ret) != Encoder.FRAME_SIZE:
             return b''
         return ret
