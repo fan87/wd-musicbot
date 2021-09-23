@@ -79,7 +79,7 @@ class WDFFmpegAudio(discord.player.AudioSource):
         kwargs.update(subprocess_kwargs)
         self.args = args
         self.kwargs = kwargs
-
+        print(args)
         self.process = self.spawn_process(args, **kwargs)
 
         self.stdout = self.process.stdout
@@ -135,7 +135,7 @@ class WDFFmpegPCMAudio(WDFFmpegAudio):
 
         args.append('-i')
         args.append('-' if pipe else source)
-        args.extend(('-f', 's16le', '-ar', '48000', '-ac', '2', '-loglevel', 'quiet'))
+        args.extend(('-f', 's16le', '-ar', '48000', '-ac', '2', '-loglevel', 'warning'))
 
         if isinstance(options, str):
             args.extend(shlex.split(options))
