@@ -32,13 +32,15 @@ class Track(pykson.JsonObject):
     author: str = pykson.StringField()
     video_id: str = pykson.StringField()
     length: int = pykson.IntegerField()  # Unit: Sec
+    thumbnail: str = pykson.StringField()
 
-    def __init__(self, name: str, author: str, video_id: str, length: int, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, name: str, author: str, video_id: str, length: int, thumbnail: str, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.name = name
         self.author = author
         self.video_id = video_id
         self.length = length
+        self.thumbnail = thumbnail
 
 
 class GuildPlayer:
@@ -207,7 +209,7 @@ class GuildPlayer:
 
         def inner() -> Track:
             details = YoutubeAPI.sync_get_video_details(youtube.video_id)
-            return Track(name=details["title"], author="author", video_id=youtube.video_id, length=int(details["lengthSeconds"]))
+            return Track(name=details["title"], author="author", video_id=youtube.video_id, length=int(details["lengthSeconds"]), thumbnail=youtube.thumbnail_url)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(inner)
@@ -249,15 +251,18 @@ class GuildPlayer:
             return yt.author
         def get_length() -> int:
             return yt.length
+        def get_thumbnail() -> str:
+            return yt.thumbnail_url
         executor = ThreadPoolExecutor(max_workers=10)
         results = await asyncio.gather(
             asyncio.get_event_loop().run_in_executor(executor, get_title),
             asyncio.get_event_loop().run_in_executor(executor, get_author),
             asyncio.get_event_loop().run_in_executor(executor, get_length),
+            asyncio.get_event_loop().run_in_executor(executor, get_thumbnail),
         )
         executor.shutdown()
 
-        return Track(results[0], results[1], str(yt.video_id), results[2])
+        return Track(results[0], results[1], str(yt.video_id), results[2], results[3])
 
 
 class MusicManager:

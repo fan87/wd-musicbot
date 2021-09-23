@@ -51,7 +51,7 @@ async def on_command(message: Message) -> None:
     embed.description += "⠀►►  "
     embed.description += TimeParser.parse(int(pcm.time/1000)) + " / " + TimeParser.parse(int(guild_player.get_current_track().length))
 
-    embed.set_image(url=f"https://i.ytimg.com/vi/{guild_player.get_current_track().video_id}/hq720.jpg")
+    embed.set_image(url=guild_player.get_current_track().thumbnail)
     embed.set_footer(text="by " + guild_player.get_current_track().author)
     embed.colour = discord.Colour.blue()
     embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"

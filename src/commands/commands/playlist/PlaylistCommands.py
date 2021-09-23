@@ -106,7 +106,7 @@ async def add_playlist(message: Message, name: str, *, song: str) -> None:
             embed.title = playlist.title
             embed.description = f":white_check_mark: 成功新增 {count} 部影片至播放清單"
             embed.colour = discord.Colour.green()
-            embed.set_image(url=f"https://i.ytimg.com/vi/{vid.video_id}/hq720.jpg")
+            embed.set_image(url=vid.thumbnail)
             embed.url = f"https://www.youtube.com/watch?v={vid.video_id}"
             await message.reply(embed=embed, mention_author=False)
             return
@@ -133,7 +133,7 @@ async def add_playlist(message: Message, name: str, *, song: str) -> None:
         embed.set_author(name=yt.author)
         embed.description = ":white_check_mark: 成功新增 " + "https://youtube.com/watch?v=" + yt.video_id + " 至播放清單"
         embed.colour = discord.Colour.green()
-        embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hq720.jpg")
+        embed.set_image(url=yt.thumbnail_url)
         embed.url = f"https://www.youtube.com/watch?v={yt.video_id}"
         await message.reply(embed=embed, mention_author=False)
     else:

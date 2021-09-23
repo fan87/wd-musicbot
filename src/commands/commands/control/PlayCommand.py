@@ -59,7 +59,7 @@ async def on_command(message: Message, *, song: str) -> None:
 
         await wdutils.MessageUtil.reply_fancy_message("請稍後... 這可能須要一些時間。 ", discord.Colour.gold(), message)
 
-        vid: typing.Any = None
+        vid: typing.Optional[Track] = None
         for video in playlist.videos:
             count = count + 1
             if count == 1:
@@ -73,8 +73,8 @@ async def on_command(message: Message, *, song: str) -> None:
         embed.title = playlist.title
         embed.description = f":white_check_mark: 成功排序 {count} 部影片至待播清單"
         embed.colour = discord.Colour.green()
-        embed.set_image(url=f"https://i.ytimg.com/vi/{vid.video_id}/hq720.jpg")
-        embed.url = f"https://www.youtube.com/watch?v={vid.video_id}"
+        embed.set_image(url=cast(Track, vid).thumbnail)
+        embed.url = f"https://www.youtube.com/watch?v={cast(Track, vid).video_id}"
         await message.reply(embed=embed, mention_author=False)
         return
     except Exception as err:
@@ -98,7 +98,7 @@ async def on_command(message: Message, *, song: str) -> None:
         embed.set_author(name=yt.author)
         embed.description = ":play_pause: 正在播放 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
-        embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hq720.jpg")
+        embed.set_image(url=yt.thumbnail_url)
         embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"
         await message.reply(embed=embed, mention_author=False)
     else:
@@ -107,6 +107,6 @@ async def on_command(message: Message, *, song: str) -> None:
         embed.set_author(name=yt.author)
         embed.description = ":white_check_mark: 已經排序 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
-        embed.set_image(url=f"https://i.ytimg.com/vi/{yt.video_id}/hq720.jpg")
+        embed.set_image(url=yt.thumbnail_url)
         embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"
         await message.reply(embed=embed, mention_author=False)
