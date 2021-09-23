@@ -20,10 +20,12 @@ from wdutils.override import override
 from commands.Command import WDCommand
 
 
+
 @register_command
 class PlayCommand(WDCommand):
     def __init__(self, commandsManager: CommandsManager) -> None:
         super().__init__(commandsManager, "play", ["p", "search", "s"], category="控制類")
+
 
 
 @main_command("播放一首歌", PlayCommand, song="影片連結")
@@ -100,7 +102,7 @@ async def on_command(message: Message, *, song: str) -> None:
         embed.description = ":play_pause: 正在播放 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
         embed.set_image(url=yt.thumbnail_url)
-        embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"
+        embed.url = f"https://www.youtube.com/watch?v={cast(Track, guild_player.get_current_track()).video_id}"
         await message.reply(embed=embed, mention_author=False)
     else:
         embed = discord.Embed()
@@ -109,5 +111,5 @@ async def on_command(message: Message, *, song: str) -> None:
         embed.description = ":white_check_mark: 已經排序 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
         embed.set_image(url=yt.thumbnail_url)
-        embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"
+        embed.url = f"https://www.youtube.com/watch?v={cast(Track, guild_player.get_current_track()).video_id}"
         await message.reply(embed=embed, mention_author=False)

@@ -23,7 +23,7 @@ class DownloadCommand(WDCommand):
 async def on_command(message: Message, url: str) -> None:
     try:
         video: pytube.YouTube = pytube.YouTube(url)
-        dir_url: str = await youtube.YoutubeAPI.get_dir_url(251, video.video_id)
+        dir_url: str = typing.cast(str, await youtube.YoutubeAPI.get_dir_url(251, video.video_id))
         await message.reply(dir_url + "\n檔案格式為Webm，並且用Opus編碼。Opus屬於有損編碼格式，但因為Youtube是使用Opus編碼影片的音訊，所以你最多得到有損的編碼格式。 \n若要轉成MP3請自行轉檔，本服務僅提供許多網站都沒有的直接從Youtube伺服器下載音訊檔案功能", mention_author=True)
     except:
         await wdutils.MessageUtil.reply_fancy_message(":x: 錯誤: 無法取得連結", discord.Colour.red(), message)

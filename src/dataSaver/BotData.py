@@ -9,8 +9,8 @@ from music.MusicManager import Track
 
 
 class PlayListData(pykson.JsonObject):
-    name: str = pykson.StringField()
-    share_id: str = pykson.StringField()
+    name: str = pykson.StringField() # type: ignore
+    share_id: str = pykson.StringField() # type: ignore
     tracks: list[Track] = pykson.ObjectListField(Track)
 
     def generate_share_id(self) -> str:
@@ -24,12 +24,12 @@ def generate_id() -> str:
     return share_id
 
 class GuildData(pykson.JsonObject):
-    guild_id: int = pykson.IntegerField()
-    volume: float = pykson.FloatField(default_value=float(1))
-    queue: list[Track] = pykson.ObjectListField(Track)
-    last_vc: int = pykson.IntegerField(default_value=0)
-    playlists: list[PlayListData] = pykson.ObjectListField(PlayListData)
-    prefix: str = pykson.StringField(default_value="__ DEFAULT __")
+    guild_id: int = pykson.IntegerField() # type: ignore
+    volume: float = pykson.FloatField(default_value=float(1)) # type: ignore
+    queue: list[Track] = pykson.ObjectListField(Track) # type: ignore
+    last_vc: int = pykson.IntegerField(default_value=0) # type: ignore
+    playlists: list[PlayListData] = pykson.ObjectListField(PlayListData) # type: ignore
+    prefix: str = pykson.StringField(default_value="__ DEFAULT __") # type: ignore
 
     def get_playlist(self, name: str) -> PlayListData:
         import InstanceManager

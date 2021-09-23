@@ -1,8 +1,8 @@
 import aiohttp
 import pytube
-import json
 
 import typing
+from pytube.streams import Stream
 
 import requests
 
@@ -22,7 +22,7 @@ class Search:
 async def search_more(search: Search) -> Search:
     if search.continuation_token == "":
         return Search("", [])
-    body: dict = {
+    body: dict[str, typing.Any] = {
         "context": {
             "client": {
                 "clientName": 1,
@@ -38,7 +38,7 @@ async def search_more(search: Search) -> Search:
             json_body = await r.json()
             for content in json_body["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]["itemSectionRenderer"]["contents"]:
                 try:
-                    vid: dict = content["videoRenderer"]
+                    vid: dict[str, typing.Any]= content["videoRenderer"]
                     for badge in vid["badges"]:
                         try:
                             if "BADGE_STYLE_TYPE_LIVE_NOW" == badge["metadataBadgeRenderer"]["style"]:
@@ -61,7 +61,7 @@ async def search_more(search: Search) -> Search:
     return Search(token, videos)
 
 async def search(query: str) -> Search:
-    body: dict = {
+    body: dict[str, typing.Any] = {
         "context": {
             "client": {
                 "clientName": 1,
@@ -78,10 +78,10 @@ async def search(query: str) -> Search:
 
             for content in json_body["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]:
                 try:
-                    nc: dict = content["itemSectionRenderer"]["contents"]
+                    nc: dict[typing.Any, typing.Any]= content["itemSectionRenderer"]["contents"]
                     for c in nc:
                         try:
-                            vid: dict = c["videoRenderer"]
+                            vid: dict[typing.Any, typing.Any] = c["videoRenderer"]
                             is_live = False
                             for badge in vid["badges"]:
                                 try:
@@ -107,7 +107,7 @@ async def search(query: str) -> Search:
 
 
 def sync_get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
-    body: dict = {
+    body: dict[str, typing.Any]= {
         "context": {
             "client": {
                 "clientName": "ANDROID",
@@ -128,11 +128,11 @@ def sync_get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
                 except:
                     pass
         except:
-            return pytube.YouTube("https://www.youtube.com/watch?v=" + video_id).streams.get_by_itag(itag).url
+            return typing.cast(str, typing.cast(Stream, pytube.YouTube("https://www.youtube.com/watch?v=" + video_id).streams.get_by_itag(itag)).url)
     return None
 
 async def get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
-    body: dict = {
+    body: dict[str, typing.Any]= {
         "context": {
             "client": {
                 "clientName": "ANDROID",
@@ -152,12 +152,12 @@ async def get_dir_url(itag: int, video_id: str) -> typing.Union[str, None]:
                     except:
                         pass
             except:
-                return pytube.YouTube("https://www.youtube.com/watch?v=" + video_id).streams.get_by_itag(itag).url
+                return typing.cast(Stream, pytube.YouTube("https://www.youtube.com/watch?v=" + video_id).streams.get_by_itag(itag)).url
     return None
 
 
-async def get_video_details(video_id: str) -> typing.Optional[dict]:
-    body: dict = {
+async def get_video_details(video_id: str) -> typing.Optional[dict[str, typing.Any]]:
+    body: dict[str, typing.Any]= {
         "context": {
             "client": {
                 "clientName": "ANDROID",
@@ -175,8 +175,8 @@ async def get_video_details(video_id: str) -> typing.Optional[dict]:
                 pass
     return None
 
-def sync_get_video_details(video_id: str) -> typing.Optional[dict]:
-    body: dict = {
+def sync_get_video_details(video_id: str) -> typing.Optional[dict[str, typing.Any]]:
+    body: dict[str, typing.Any] = {
         "context": {
             "client": {
                 "clientName": "ANDROID",

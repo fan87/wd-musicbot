@@ -5,7 +5,7 @@ from discord.message import Message
 
 import InstanceManager
 import wdutils.MessageUtil
-import youtube
+from youtube import YoutubeAPI
 from commands.Command import WDCommand
 from commands.CommandsManager import CommandsManager, main_command, register_command
 from dataSaver.BotData import PlayListData
@@ -117,7 +117,7 @@ async def add_playlist(message: Message, name: str, *, song: str) -> None:
                 yt.streams
             except:
                 await wdutils.MessageUtil.reply_fancy_message(":mag: 搜尋中...", discord.Colour.gold(), message)
-                result: youtube.YoutubeAPI.Search = await youtube.YoutubeAPI.search(song)
+                result: YoutubeAPI.Search = await YoutubeAPI.search(song)
 
                 if len(result.videos) <= 0:
                     await wdutils.MessageUtil.reply_fancy_message(":grimacing: 抱歉我沒找到音樂，請直接使用YouTube搜尋並輸入連結。值得注意的是: 直播目前不支援",

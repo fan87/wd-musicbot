@@ -1,6 +1,6 @@
 import json
 import typing
-from typing import IO
+from typing import IO, cast
 
 from dataSaver.BotConfig import BotConfig
 import os
@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 
 class ConfigsManager:
 
-    bot: 'WDMusicBot' = None
+    bot: 'WDMusicBot'
 
     def __init__(self, bot: 'WDMusicBot') -> None:
         from dataSaver.BotData import MainData
@@ -25,8 +25,8 @@ class ConfigsManager:
         except:
             pass
         try:
-            config_file: IO = open("run/config.json", "r")
-            bot.config = Pykson().from_json(config_file.read(), BotConfig)
+            config_file: IO[typing.Any] = open("run/config.json", "r")
+            bot.config = typing.cast(BotConfig, Pykson().from_json(config_file.read(), BotConfig))
             config_file.close()
         except:
             print("========== 水滴機器人 ==========")
@@ -41,8 +41,8 @@ class ConfigsManager:
             open("run/config.json", "w").write(Pykson().to_json(bot.config))
 
         try:
-            data_file: IO = open("run/data.json", "r")
-            bot.data = Pykson().from_json(data_file.read(), MainData)
+            data_file: IO[typing.Any] = open("run/data.json", "r")
+            bot.data = cast(MainData, Pykson().from_json(data_file.read(), MainData))
             data_file.close()
         except:
             bot.data.guilds = []

@@ -4,12 +4,13 @@ import threading
 from asyncio import AbstractEventLoop
 from typing import TYPE_CHECKING, Any, Callable
 import typing
+from discord.guild import Guild
 
 import discord.user
 from discord.channel import TextChannel
 from discord.member import Member
 from discord.message import Message
-from discord.user import User
+from discord.user import ClientUser, User
 from events.EventManager import DiscordEventType
 from functools import partial
 from logging import Logger
@@ -22,16 +23,16 @@ if TYPE_CHECKING:
 
 
 class CommandsManager:
-    bot: 'WDMusicBot' = None
+    bot: 'WDMusicBot'
 
-    commands: dict = {}
+    commands: dict['WDCommand', typing.Any]= {}
     prefix: str = ""
 
     def __init__(self, bot: 'WDMusicBot', prefix: str) -> None:
         self.bot = bot
         self.prefix = prefix
 
-    def get_prefix(self, guild: typing.Union[discord.Guild, Any]) -> str:
+    def get_prefix(self, guild: typing.Union[Guild, Any]) -> str:
         if self.bot.data.get_guild(guild).prefix == "__ DEFAULT __":
             return self.prefix
         else:
@@ -61,11 +62,11 @@ class CommandsManager:
 
     async def process_command(self, message: Message) -> None:
         from commands.Command import WDCommand
-        user: User = message.author
+        user: User = typing.cast(User, message.author)
         if user.bot:
             return
         content: str = message.content
-        bot_user: User = self.bot.user
+        bot_user: User = typing.cast(User, self.bot.user)
         if bot_user in message.mentions:
             await message.reply("哈囉! 我的指令前綴是 " + self.get_prefix(message.guild) + "  請使用 " + self.get_prefix(
                 message.guild) + "help 來查看指令清單")
@@ -75,7 +76,7 @@ class CommandsManager:
             return
         command_name: str = content.split(" ")[0]
         command_name = command_name[int(len(self.get_prefix(message.guild))):int(len(command_name))]
-        command: WDCommand = self.find_command(command_name)
+        command: typing.Optional[WDCommand] = self.find_command(command_name)
 
         if command is None:
             return
@@ -89,7 +90,7 @@ class CommandsManager:
             if arg != "":
                 arguments.append(arg)
 
-        parameters: list = [message]
+        parameters: list[typing.Any] = [message]
         func = self.commands[command]["main"]
         count: int = -2
         starstar: str = ""
@@ -159,11 +160,11 @@ class CommandsManager:
         if typeIn == "discord.user.User" or typeIn == "discord.User":
             if stringIn.startswith("<@!") and stringIn.endswith(">"):
                 uid: str = stringIn[3:-1]
-                member: Member = InstanceManager.mainInstance.get_user(int(uid))
+                member: Member = typing.cast(Member, InstanceManager.mainInstance.get_user(int(uid)))
                 return member
             if stringIn.startswith("<@") and stringIn.endswith(">"):
                 uid = stringIn[2:-1]
-                member = InstanceManager.mainInstance.get_user(int(uid))
+                member = typing.cast(Member, InstanceManager.mainInstance.get_user(int(uid)))
                 return member
 
         if typeIn == "discord.member.Member" or typeIn == "discord.Member":

@@ -1,6 +1,3 @@
-import asyncio
-from asyncio.events import AbstractEventLoop
-
 import typing
 
 import InstanceManager
@@ -13,7 +10,8 @@ from commands.Command import WDCommand
 @register_command
 class LeaveCommand(WDCommand):
     def __init__(self, commandsManager: CommandsManager) -> None:
-        super().__init__(commandsManager, "leave", ["l", "quit", "q", "disconnect", "dc"], category="控制類")
+        super().__init__(commandsManager, "leave", ["l", "quit", "disconnect", "dc"], category="控制類")
+        
 
 @main_command(description="退出機器人所在的語音頻道", head_command=LeaveCommand)
 async def leave(message: Message) -> None:

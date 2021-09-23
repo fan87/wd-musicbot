@@ -1,5 +1,3 @@
-import typing
-
 from discord.flags import Intents
 
 from music.MusicManager import MusicManager
@@ -14,10 +12,10 @@ from dataSaver.BotData import MainData
 
 class WDMusicBot(discord.Client):
     
-    eventManager: DiscordEventManager = None
-    configsManager: ConfigsManager = None
-    commandsManager: CommandsManager = None
-    musicManager: MusicManager = None
+    eventManager: DiscordEventManager
+    configsManager: ConfigsManager
+    commandsManager: CommandsManager
+    musicManager: MusicManager
     ready: bool = False
 
     config: BotConfig = BotConfig()

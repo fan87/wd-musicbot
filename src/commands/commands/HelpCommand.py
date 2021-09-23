@@ -62,7 +62,7 @@ async def on_command(message: Message) -> None:
 def get_command_info(command: WDCommand, guild: typing.Any) -> str:
     import InstanceManager
     commands_manager: CommandsManager = InstanceManager.mainInstance.commandsManager
-    info: dict = commands_manager.commands[command]
+    info: dict[str, typing.Any]= commands_manager.commands[command]
     out: str = commands_manager.get_prefix(guild) + command.name
     if not command.usage == "":
         out += " " + command.usage + "  -  " + info["main_description"]

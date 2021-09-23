@@ -1,9 +1,8 @@
 from enum import Enum
 from typing import Callable, Any
+import typing
 
 import discord
-
-from wdutils.Function import Function
 
 
 class DiscordEventType(Enum):
@@ -70,21 +69,21 @@ class DiscordEventType(Enum):
 
 
 class DiscordEventManager:
-    __bot: discord.Client = None
+    __bot: discord.Client
 
-    __listeners: list = []
+    __listeners: list[dict[Any, Any]] = []
 
     def __init__(self, bot: discord.Client) -> None:
         self.__bot = bot
         self.register_listeners()
 
-    def add_listener(self, event_type: DiscordEventType, func: Callable) -> None:
-        self.__listeners.append({"event_type": event_type, "func": func})
+    def add_listener(self, event_type: DiscordEventType, f: typing.Any) -> None:
+        self.__listeners.append({"event_type": event_type, "func": f})
 
     async def fire_event(self, event_type: DiscordEventType, *args) -> None:
         for listener in self.__listeners:
             if listener["event_type"] == event_type:
-                func: Function = listener["func"]
+                func: typing.Any = listener["func"]
                 await func(*args)
 
 

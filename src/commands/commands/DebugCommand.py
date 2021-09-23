@@ -38,10 +38,10 @@ out: list[typing.Any] = [None, None]
 
 @main_command("除錯用指令(僅限開發者)", PrefixCommand, cmd="指令")
 async def on_command(message: Message, *, cmd: str) -> None:
-    if message.author.id in InstanceManager.mainInstance.config.owner:
+    if typing.cast(typing.Any, wdutils).id in InstanceManager.mainInstance.config.owner:
         try:
             globals().update({"bot": InstanceManager.mainInstance, "message": message})
-            ex_locals: dict = {"bot": InstanceManager.mainInstance, "message": message}
+            ex_locals: dict[str, typing.Any]= {"bot": InstanceManager.mainInstance, "message": message}
             in_locals = {"bot": InstanceManager.mainInstance, "message": message, "input": None}
             in_locals.update(globals())
             out = [None, None]

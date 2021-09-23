@@ -20,8 +20,9 @@ class PingCommand(WDCommand):
 async def on_command(message: Message) -> None:
     bot = InstanceManager.mainInstance
     latency: float = bot.latency
+    colour: discord.Colour = discord.Colour.dark_red()
     if latency >= 1:
-        colour: discord.Colour = discord.Colour.dark_red()
+        colour = discord.Colour.dark_red()
     elif latency >= 0.7:
         colour = discord.Colour.red()
     elif latency >= 0.4:

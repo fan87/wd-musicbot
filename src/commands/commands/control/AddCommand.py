@@ -1,22 +1,17 @@
-import asyncio
-import threading
-from typing import ContextManager, cast
+from typing import cast
 
-import re
 
 import pytube
 import typing
 
 import wdutils.MessageUtil
 import youtube.YoutubeAPI
-from Bot import WDMusicBot
 import discord
 
 from discord.message import Message
 from commands.CommandsManager import CommandsManager, main_command, register_command
-from music.MusicManager import GuildPlayer, MusicManager, Track
+from music.MusicManager import GuildPlayer, Track
 from wdutils import MessageUtil
-from wdutils.override import override
 from commands.Command import WDCommand
 
 
@@ -100,7 +95,7 @@ async def on_command(message: Message, index: int, *, song: str) -> None:
         embed.description = ":play_pause: 正在播放 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
         embed.set_image(url=yt.thumbnail_url)
-        embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"
+        embed.url = f"https://www.youtube.com/watch?v={cast(Track, guild_player.get_current_track()).video_id}"
         await message.reply(embed=embed, mention_author=False)
     else:
         embed = discord.Embed()
@@ -109,5 +104,5 @@ async def on_command(message: Message, index: int, *, song: str) -> None:
         embed.description = ":white_check_mark: 已經排序 " + "https://youtube.com/watch?v=" + yt.video_id
         embed.colour = discord.Colour.green()
         embed.set_image(url=yt.thumbnail_url)
-        embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"
+        embed.url = f"https://www.youtube.com/watch?v={cast(Track, guild_player.get_current_track()).video_id}"
         await message.reply(embed=embed, mention_author=False)

@@ -6,11 +6,11 @@ class WDCommand:
 
     name: str = ""
     category: str = ""
-    alias: list = []
-    commandsManager: CommandsManager = None
+    alias: list[str] = []
+    commandsManager: CommandsManager
     usage: str = ""
 
-    def __init__(self, commandsManager: CommandsManager, name: str, aliases: list, category: str = "", *, custom_usage: str = "") -> None:
+    def __init__(self, commandsManager: CommandsManager, name: str, aliases: list[str], category: str = "", *, custom_usage: str = "") -> None:
         self.commandsManager = commandsManager
         self.name = name
         self.alias = aliases

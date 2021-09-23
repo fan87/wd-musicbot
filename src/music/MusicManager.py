@@ -28,11 +28,11 @@ if TYPE_CHECKING:
 
 
 class Track(pykson.JsonObject):
-    name: str = pykson.StringField()
-    author: str = pykson.StringField()
-    video_id: str = pykson.StringField()
-    length: int = pykson.IntegerField()  # Unit: Sec
-    thumbnail: str = pykson.StringField()
+    name: str = pykson.StringField() # type: ignore
+    author: str = pykson.StringField() # type: ignore
+    video_id: str = pykson.StringField() # type: ignore
+    length: int = pykson.IntegerField() # type: ignore  # Unit: Seconds
+    thumbnail: str = pykson.StringField() # type: ignore
 
     def __init__(self, name: str, author: str, video_id: str, length: int, thumbnail: str, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -44,7 +44,7 @@ class Track(pykson.JsonObject):
 
 
 class GuildPlayer:
-    guild: Guild = None
+    guild: Guild
     repeat_queue: bool = False
 
 
@@ -75,7 +75,7 @@ class GuildPlayer:
         self.get_music_manager().bot.configsManager.save_data()
 
     def get_audio_source(self) -> music.WDAudioSource.WDVolumeTransformer:
-        return self.get_voice_client().source
+        return cast(music.WDAudioSource.WDVolumeTransformer, self.get_voice_client().source)
 
     def get_music_manager(self) -> 'MusicManager':
         return cast('MusicManager', self._music_manager)
@@ -152,11 +152,11 @@ class GuildPlayer:
         return self.guild.voice_client
 
     def __play_song(self, video_id: str) -> None:
-        import InstanceManager
+        
         try:
-            dir_url = youtube.YoutubeAPI.sync_get_dir_url(251, video_id)
+            dir_url: Optional[str] = youtube.YoutubeAPI.sync_get_dir_url(251, video_id)
             self.get_voice_client().play(music.WDAudioSource.WDVolumeTransformer(
-                music.WDAudioSource.WDFFmpegPCMAudio(dir_url,
+                music.WDAudioSource.WDFFmpegPCMAudio(cast(str, dir_url),
                                                      before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -err_detect ignore_err',
                                                      options='-vn'
                                                      ),
@@ -208,10 +208,10 @@ class GuildPlayer:
     def fast_add_youtube_to_queue(self, youtube: YouTube) -> Track:
 
         def inner() -> Track:
-            details = YoutubeAPI.sync_get_video_details(youtube.video_id)
+            details: typing.Any = YoutubeAPI.sync_get_video_details(youtube.video_id)
             return Track(name=details["title"], author="author", video_id=youtube.video_id, length=int(details["lengthSeconds"]), thumbnail=youtube.thumbnail_url)
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor() as executor:
             future = executor.submit(inner)
             track = future.result()
             if self.get_current_track() is None:
@@ -266,8 +266,8 @@ class GuildPlayer:
 
 
 class MusicManager:
-    bot: 'WDMusicBot' = None
-    players: list = []
+    bot: 'WDMusicBot'
+    players: list[GuildPlayer] = []
 
     def __init__(self, bot: 'WDMusicBot') -> None:
         self.bot = bot
@@ -279,8 +279,8 @@ class MusicManager:
         for guild in bot.data.guilds:
             if guild.last_vc != 0:
                 try:
-                    dcguild: Guild = bot.get_guild(guild.guild_id)
-                    channel: discord.VoiceChannel = dcguild.get_channel(guild.last_vc)
+                    dcguild: Guild = cast(Guild, bot.get_guild(guild.guild_id))
+                    channel: discord.VoiceChannel = cast(discord.VoiceChannel, dcguild.get_channel(guild.last_vc))
                     await channel.connect()
                     guild_player: GuildPlayer = self.get_guild_player(dcguild)
                     if len(guild_player.tracks) >= 1:

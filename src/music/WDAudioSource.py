@@ -27,8 +27,6 @@ class WDVolumeTransformer(discord.player.PCMVolumeTransformer):
         self.original.set_bass(value, self.time)
 
     def __init__(self, original: 'WDFFmpegAudio', volume: float=float(1.0)) -> None:
-        if not isinstance(original, discord.AudioSource):
-            raise TypeError('expected AudioSource not {0.__class__.__name__}.'.format(original))
 
         if original.is_opus():
             raise ClientException('AudioSource must not be Opus encoded.')
@@ -58,10 +56,10 @@ class WDVolumeTransformer(discord.player.PCMVolumeTransformer):
         return audioop.mul(ret, 2, min(self._volume, 4.0))
 
 
-class WDFFmpegAudio(discord.AudioSource):
+class WDFFmpegAudio(discord.player.AudioSource):
 
     args: list[str] = []
-    kwargs: dict = {}
+    kwargs: dict[str, typing.Any]= {}
 
 
     def read(self) -> bytes:
@@ -166,7 +164,7 @@ class WDFFmpegPCMAudio(WDFFmpegAudio):
             return b''
         return ret
 
-    def is_opus(self) -> bool:
+    def is_opus(self):
         return False
 
 

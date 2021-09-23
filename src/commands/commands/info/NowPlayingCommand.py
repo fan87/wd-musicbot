@@ -1,6 +1,7 @@
 import asyncio
 import threading
 import typing
+from music.MusicManager import Track
 
 import music.WDAudioSource
 import wdutils.MessageUtil
@@ -54,5 +55,5 @@ async def on_command(message: Message) -> None:
     embed.set_image(url=guild_player.get_current_track().thumbnail)
     embed.set_footer(text="by " + guild_player.get_current_track().author)
     embed.colour = discord.Colour.blue()
-    embed.url = f"https://www.youtube.com/watch?v={guild_player.get_current_track().video_id}"
+    embed.url = f"https://www.youtube.com/watch?v={typing.cast(Track, guild_player.get_current_track()).video_id}"
     await message.reply(embed=embed, mention_author=False)
