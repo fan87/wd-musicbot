@@ -39,6 +39,14 @@ async def search_more(search: Search) -> Search:
             for content in json_body["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]["itemSectionRenderer"]["contents"]:
                 try:
                     vid: dict = content["videoRenderer"]
+                    for badge in vid["badges"]:
+                        try:
+                            if "BADGE_STYLE_TYPE_LIVE_NOW" == badge["metadataBadgeRenderer"]["style"]:
+                                is_live = True
+                        except:
+                            pass
+                    if is_live:
+                        continue
                     yt: pytube.YouTube = pytube.YouTube("https://www.youtube.com/watch?v=" + vid["videoId"])
                     yt.title = vid["title"]["runs"][0]["text"]
                     yt.author = vid["ownerText"]["runs"][0]["text"]
@@ -74,6 +82,15 @@ async def search(query: str) -> Search:
                     for c in nc:
                         try:
                             vid: dict = c["videoRenderer"]
+                            is_live = False
+                            for badge in vid["badges"]:
+                                try:
+                                    if "BADGE_STYLE_TYPE_LIVE_NOW" == badge["metadataBadgeRenderer"]["style"]:
+                                        is_live = True
+                                except:
+                                    pass
+                            if is_live:
+                                continue
                             yt: pytube.YouTube = pytube.YouTube("https://www.youtube.com/watch?v=" + vid["videoId"])
                             yt.title = vid["title"]["runs"][0]["text"]
                             yt.author = vid["ownerText"]["runs"][0]["text"]

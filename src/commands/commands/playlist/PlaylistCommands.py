@@ -114,12 +114,13 @@ async def add_playlist(message: Message, name: str, *, song: str) -> None:
             print(err)
             try:
                 yt: pytube.YouTube = pytube.YouTube(song)
+                yt.streams
             except:
                 await wdutils.MessageUtil.reply_fancy_message(":mag: 搜尋中...", discord.Colour.gold(), message)
                 result: youtube.YoutubeAPI.Search = await youtube.YoutubeAPI.search(song)
 
                 if len(result.videos) <= 0:
-                    await wdutils.MessageUtil.reply_fancy_message(":grimacing: 抱歉我沒找到音樂，請再次使用指令搜尋",
+                    await wdutils.MessageUtil.reply_fancy_message(":grimacing: 抱歉我沒找到音樂，請直接使用YouTube搜尋並輸入連結。值得注意的是: 直播目前不支援",
                                                                   discord.Colour.red(),
                                                                   message)
                     return

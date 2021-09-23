@@ -81,6 +81,7 @@ async def on_command(message: Message, index: int, *, song: str) -> None:
         print(err)
         try:
             yt: pytube.YouTube = pytube.YouTube(song)
+            yt.streams
         except:
             await wdutils.MessageUtil.reply_fancy_message(":mag: 搜尋中...", discord.Colour.gold(), message)
             result: youtube.YoutubeAPI.Search = await youtube.YoutubeAPI.search(song)
